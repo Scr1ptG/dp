@@ -1,0 +1,2524 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Графы на пальцах</title>
+<meta name="description" content="Интерактивная презентация: вершины и рёбра, матрица смежности, список смежности, что выбрать и код на Java.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#FAFCFF; --grid:#E3ECF6; --surface:#FFFFFF; --line:#CBD8E8;
+  --ink:#1B2A4A; --ink-2:#4D5B77; --muted:#7A879E;
+  --pen:#2F4FD8; --pen-ink:#FFFFFF; --margin:#E0524A; --marker:#FFE14D; --marker-soft:#FFF3A8;
+  --bar:#A9BEEB; --cmp:#FFD43B; --swap:#F2826F; --done:#57B884; --pivot:#9A6AE6; --less:#CDEBD8; --dimbar:#DCE4F1;
+  --good:#1D8A4E; --bad:#C8352E; --code-bg:#F1F5FC;
+  --k:#2F4FD8; --t:#9A3FA8; --n:#B5560E; --c:#6C7890; --s:#1D7A55;
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300;
+  --shadow:0 1px 0 rgba(27,42,74,.06), 0 6px 18px rgba(27,42,74,.07);
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --f-hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#16231E; --grid:#1E2E28; --surface:#1C2B25; --line:#33473F;
+    --ink:#EAF1EC; --ink-2:#B4C3BA; --muted:#8A9A91;
+    --pen:#8FB0FF; --pen-ink:#0F1A15; --margin:#FF8A80; --marker:#FFE47A; --marker-soft:#4A4520;
+    --bar:#5E7DB8; --cmp:#E9C43A; --swap:#E06D5B; --done:#3FA56E; --pivot:#9C7BEA; --less:#2F5A43; --dimbar:#2A3B35;
+    --good:#5BD18C; --bad:#FF8A80; --code-bg:#111B17;
+    --k:#8FB0FF; --t:#E39BEF; --n:#F2A65A; --c:#8A9A91; --s:#7FD6A8;
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2e9a2e;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#16231E; --grid:#1E2E28; --surface:#1C2B25; --line:#33473F;
+  --ink:#EAF1EC; --ink-2:#B4C3BA; --muted:#8A9A91;
+  --pen:#8FB0FF; --pen-ink:#0F1A15; --margin:#FF8A80; --marker:#FFE47A; --marker-soft:#4A4520;
+  --bar:#5E7DB8; --cmp:#E9C43A; --swap:#E06D5B; --done:#3FA56E; --pivot:#9C7BEA; --less:#2F5A43; --dimbar:#2A3B35;
+  --good:#5BD18C; --bad:#FF8A80; --code-bg:#111B17;
+  --k:#8FB0FF; --t:#E39BEF; --n:#F2A65A; --c:#8A9A91; --s:#7FD6A8;
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#2e9a2e;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{font-size:16px}
+body{
+  margin:0; background-color:var(--paper); color:var(--ink); font-family:var(--f-body); line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; background-attachment:fixed;
+  padding-inline:16px;
+}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pen);outline-offset:2px;border-radius:4px}
+
+/* ── chrome ── */
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  max-width:1180px;margin:0 auto;padding-block:10px;background:var(--paper);border-bottom:1px solid var(--line)}
+.brand{font-family:var(--f-display);font-weight:700;font-size:.95rem;letter-spacing:-.01em;white-space:nowrap}
+.brand b{background:linear-gradient(transparent 55%,var(--marker-soft) 55%);padding-inline:2px}
+.chip{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2);
+  border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.chip.p2{color:var(--pen);border-color:var(--pen)}
+.bar .spacer{flex:1}
+.counter{font-family:var(--f-mono);font-size:.85rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden;max-width:1180px;margin:0 auto}
+.progress i{display:block;height:100%;background:var(--pen);width:0;transition:width .3s}
+
+.deck{max-width:1180px;margin:0 auto;padding-block:18px 96px}
+.slide[hidden]{display:none!important}
+.page{position:relative;background:transparent;padding:8px 0 8px 76px;min-height:calc(100vh - 190px)}
+.page::before{content:"";position:absolute;left:58px;top:0;bottom:0;width:2px;background:var(--margin);opacity:.75}
+.no{position:absolute;left:0;top:10px;width:48px;text-align:right;font-family:var(--f-hand);font-size:1.9rem;line-height:1;color:var(--margin)}
+.eyebrow{font-size:.74rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--ink-2);margin:0 0 6px}
+.slide h2{font-family:var(--f-display);font-weight:700;font-size:clamp(1.45rem,2.6vw,2.2rem);line-height:1.15;letter-spacing:-.02em;margin:0 0 18px;text-wrap:balance;max-width:26ch}
+.slide h3{font-family:var(--f-display);font-weight:500;font-size:1.05rem;margin:0 0 8px;letter-spacing:-.01em}
+.slide p,.slide li{max-width:64ch}
+.lead{font-size:1.15rem;color:var(--ink)}
+.hand{font-family:var(--f-hand);font-size:1.55rem;line-height:1.15;color:var(--pen)}
+mark{background:linear-gradient(transparent 50%,var(--marker-soft) 50%);color:inherit;padding-inline:2px}
+code{font-family:var(--f-mono);font-size:.9em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:28px;align-items:start}
+.cols.even{grid-template-columns:1fr 1fr}
+.cols.wide-left{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.note{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:12px 14px}
+.note h3{margin-bottom:4px}
+.note p{margin:0}
+.big-num{font-family:var(--f-display);font-size:2rem;font-weight:700;color:var(--pen);line-height:1}
+ul.clean{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:8px}
+ul.clean li{padding-left:22px;position:relative}
+ul.clean li::before{content:"";position:absolute;left:4px;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--pen)}
+
+/* ── buttons ── */
+.btn{border:1.5px solid var(--pen);background:var(--surface);color:var(--pen);border-radius:8px;padding:7px 13px;
+  font-weight:600;font-size:.9rem;cursor:pointer;transition:background .15s,color .15s,transform .1s;white-space:nowrap}
+.btn:hover{background:var(--pen);color:var(--pen-ink)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--pen);color:var(--pen-ink)}
+.btn.ghost{border-color:var(--line);color:var(--ink-2)}
+.btn.ghost:hover{background:var(--line);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ── practice block ── */
+.try{position:relative;margin-top:26px;border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:22px 18px 16px;box-shadow:var(--shadow)}
+.try::before{content:attr(data-label);position:absolute;top:-14px;left:14px;font-family:var(--f-hand);font-size:1.45rem;line-height:1;
+  background:var(--marker);color:#1B2A4A;padding:3px 10px 4px;border-radius:3px;transform:rotate(-1.5deg)}
+.try .q{font-weight:600;margin:0 0 10px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:1.5px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 12px;cursor:pointer;text-align:left;font-size:.95rem}
+.opt:hover{border-color:var(--pen)}
+.opt.ok{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,transparent)}
+.opt.ok::before{content:"✓ ";color:var(--good);font-weight:700}
+.opt.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.opt.bad::before{content:"✗ ";color:var(--bad);font-weight:700}
+.fb{margin:10px 0 0;min-height:1.5em;font-size:.95rem}
+.fb.good{color:var(--good)} .fb.bad{color:var(--bad)}
+.fill{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fill input,.blank{font-family:var(--f-mono);border:0;border-bottom:2px dashed var(--pen);background:var(--marker-soft);padding:3px 6px;border-radius:4px 4px 0 0;min-width:4ch}
+.fill input{width:12ch}
+input.good{border-bottom:2px solid var(--good);background:color-mix(in srgb,var(--good) 18%,transparent)}
+input.bad{border-bottom:2px solid var(--bad);background:color-mix(in srgb,var(--bad) 14%,transparent)}
+.quiz + .quiz{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)}
+.score{font-family:var(--f-display);font-size:1.1rem}
+
+/* ── code ── */
+pre.code{margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;
+  font-family:var(--f-mono);font-size:.84rem;line-height:1.6;tab-size:4}
+pre.code .k{color:var(--k);font-weight:600} pre.code .t{color:var(--t)} pre.code .n{color:var(--n)}
+pre.code .c{color:var(--c);font-style:italic} pre.code .s{color:var(--s)}
+pre.code .blank{font-size:.84rem;color:var(--ink)}
+.code-check{margin-top:8px}
+
+/* ── visualizer ── */
+.player{display:flex;flex-direction:column;gap:10px}
+.viz{position:relative;height:230px;border-bottom:2px solid var(--ink-2);margin-top:14px}
+.viz.cells{height:108px;border-bottom:0}
+.viz.short{height:170px}
+.it{position:absolute;bottom:26px;left:0;border-radius:5px 5px 0 0;background:var(--bar);
+  transition:transform .38s cubic-bezier(.3,.7,.3,1),height .3s,background-color .2s,opacity .25s;
+  display:flex;align-items:flex-end;justify-content:center;font-family:var(--f-mono);font-size:.8rem;font-weight:600;color:var(--ink);padding-bottom:3px}
+.viz.cells .it{height:48px!important;bottom:34px;border-radius:7px;align-items:center;padding:0;border:1.5px solid var(--line);background:var(--surface);font-size:.95rem}
+.it.cmp{background:var(--cmp);color:#1B2A4A} .it.swap{background:var(--swap);color:#1B2A4A} .it.done{background:var(--done);color:#0E2418}
+.it.pivot{background:var(--pivot);color:#fff} .it.less{background:var(--less)} .it.dim{opacity:.28}
+.it.ok{background:var(--less)}
+.viz.cells .it.cmp{background:var(--cmp);border-color:var(--cmp)} .viz.cells .it.done{background:var(--done);border-color:var(--done)}
+.viz.cells .it.dim{opacity:.25}
+.viz.nolabel .it{font-size:0}
+.idx{position:absolute;bottom:4px;font-family:var(--f-mono);font-size:.7rem;color:var(--muted);text-align:center}
+.ptr{position:absolute;bottom:-26px;font-family:var(--f-mono);font-size:.78rem;font-weight:700;color:var(--pen);text-align:center;transition:transform .3s;white-space:nowrap}
+.ptr::before{content:"▲";display:block;font-size:.6rem;line-height:1}
+.viz.cells .ptr{bottom:2px}
+.viz.cells .idx{bottom:86px}
+.bracket{position:absolute;top:-10px;height:8px;border:2px solid var(--pen);border-bottom:0;border-radius:4px 4px 0 0;transition:all .3s;opacity:.8}
+.pnote{min-height:3em;margin:22px 0 0;font-size:1rem;background:var(--paper);border-left:3px solid var(--marker);padding:6px 10px}
+.stats{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--ink-2)}
+.stats b{font-family:var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.legend-states{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;color:var(--ink-2)}
+.legend-states span{display:inline-flex;align-items:center;gap:5px}
+.legend-states i{width:12px;height:12px;border-radius:3px;display:inline-block}
+select.speed{border:1.5px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font-size:.85rem}
+
+/* race */
+.race{display:grid;gap:14px}
+.race .lane{border:1px solid var(--line);border-radius:10px;padding:8px 12px 10px;background:var(--surface)}
+.race .lane .viz{height:90px;margin-top:6px}
+.race .lane .it{bottom:0;border-radius:2px 2px 0 0}
+.lane-head{display:flex;justify-content:space-between;gap:8px;font-size:.9rem;flex-wrap:wrap}
+.lane-head b{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.lane.win{border-color:var(--good);box-shadow:0 0 0 2px color-mix(in srgb,var(--good) 30%,transparent)}
+
+/* games */
+.cards{display:flex;gap:10px;flex-wrap:wrap}
+.card{width:58px;height:78px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);display:grid;place-items:center;
+  font-family:var(--f-display);font-size:1.3rem;cursor:pointer;box-shadow:var(--shadow);transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-3px)}
+.card.sel{border-color:var(--pen);transform:translateY(-8px);box-shadow:0 0 0 3px color-mix(in srgb,var(--pen) 30%,transparent)}
+.card.fin{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,var(--surface))}
+.card.small{width:46px;height:56px;font-size:1.05rem;cursor:default}
+.card.head{border-color:var(--pen);cursor:pointer}
+.card.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.piles{display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:center}
+.piles .lbl{font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2)}
+.baskets{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch;margin-top:12px}
+.basket{min-height:74px;border:2px dashed var(--line);border-radius:10px;padding:8px;display:flex;gap:6px;flex-wrap:wrap;align-content:flex-start}
+.basket .lbl{width:100%;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2)}
+.pivot-card{border-color:var(--pivot)!important;background:color-mix(in srgb,var(--pivot) 18%,var(--surface))!important}
+
+/* tree */
+.tree{display:flex;flex-direction:column;gap:10px;overflow-x:auto;padding-bottom:4px}
+.trow{display:flex;gap:18px;justify-content:center;align-items:center;transition:opacity .35s,transform .35s}
+.trow.off{opacity:0;transform:translateY(-6px);pointer-events:none}
+.trow .tag{font-family:var(--f-hand);font-size:1.2rem;color:var(--ink-2);min-width:88px;text-align:right}
+.grp{display:flex;border:1.5px solid var(--ink-2);border-radius:6px;overflow:hidden}
+.grp span{min-width:34px;padding:5px 4px;text-align:center;font-family:var(--f-mono);font-size:.85rem;background:var(--surface)}
+.grp span+span{border-left:1px solid var(--line)}
+.trow.merge .grp{border-color:var(--done)}
+.trow.merge .grp span{background:color-mix(in srgb,var(--done) 16%,var(--surface))}
+
+/* triangle */
+.tri{display:flex;flex-direction:column;gap:5px}
+.tri .r{display:flex;gap:4px;align-items:center}
+.tri .r i{width:22px;height:22px;border-radius:4px;background:var(--cmp);display:inline-block}
+.tri .r span{font-size:.8rem;color:var(--ink-2);margin-left:8px;font-family:var(--f-mono)}
+
+/* chart */
+.chart-wrap{position:relative}
+.chart-wrap svg{width:100%;height:auto;display:block;overflow:visible}
+.chart-wrap text{font-family:var(--f-mono);font-size:11px;fill:var(--muted)}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:.8rem;box-shadow:var(--shadow);min-width:150px;z-index:3}
+.tip[hidden]{display:none}
+.tip div{display:flex;justify-content:space-between;gap:12px;font-variant-numeric:tabular-nums}
+.tip i{display:inline-block;width:14px;height:3px;margin-right:6px;vertical-align:middle;border-radius:2px}
+.lgd{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.lgd button{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;font-family:var(--f-mono);font-size:.8rem;cursor:pointer}
+.lgd button[aria-pressed="false"]{opacity:.4;text-decoration:line-through}
+.lgd svg{width:22px;height:8px}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-2);font-weight:700;background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.focus td{background:color-mix(in srgb,var(--marker) 22%,transparent)}
+.o{font-family:var(--f-mono);white-space:nowrap}
+.tag-good,.tag-mid,.tag-bad{font-size:.72rem;font-weight:700;padding:1px 7px;border-radius:999px;white-space:nowrap}
+.tag-good{color:var(--good);border:1px solid var(--good)}
+.tag-mid{color:var(--n);border:1px solid var(--n)}
+.tag-bad{color:var(--bad);border:1px solid var(--bad)}
+
+/* parsons */
+.parsons{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.plist{min-height:120px;border:1.5px dashed var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:5px;background:var(--paper)}
+.plist h4{margin:0 0 4px;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-2)}
+.pline{font-family:var(--f-mono);font-size:.8rem;text-align:left;white-space:pre;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 8px;cursor:pointer;overflow-x:auto}
+.pline:hover{border-color:var(--pen)}
+.pline.good{border-color:var(--good)} .pline.bad{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+
+/* checklist */
+.checklist{display:flex;flex-direction:column;gap:6px}
+.checklist label{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer}
+.checklist input{width:18px;height:18px;accent-color:var(--good)}
+.checklist code{white-space:nowrap}
+
+/* decide */
+.decide .step{display:flex;flex-direction:column;gap:10px}
+.verdict{border:2px solid var(--good);border-radius:10px;padding:12px 14px;background:color-mix(in srgb,var(--good) 8%,var(--surface))}
+.verdict h3{color:var(--good)}
+
+/* cover */
+.cover-title{font-family:var(--f-display);font-weight:700;font-size:clamp(2.1rem,6vw,4.4rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 14px;max-width:14ch;text-wrap:balance}
+.cover-title em{font-style:normal;background:linear-gradient(transparent 58%,var(--marker-soft) 58%)}
+.plan{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.plan .note{padding:14px 16px}
+.plan ol{margin:6px 0 0;padding-left:20px}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);border-top:1px solid var(--line);padding-inline:16px}
+.nav-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:10px;padding-block:10px}
+.nav .title{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.9rem;color:var(--ink-2)}
+.kbd{font-family:var(--f-mono);font-size:.72rem;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--muted)}
+dialog.toc{border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);max-width:min(620px,calc(100vw - 32px));width:100%;padding:0;max-height:80vh}
+dialog.toc::backdrop{background:rgba(10,20,30,.45)}
+.toc-head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface)}
+.toc ol{margin:0;padding:10px 18px 18px 48px;display:flex;flex-direction:column;gap:2px}
+.toc li button{background:none;border:0;padding:4px 6px;cursor:pointer;text-align:left;border-radius:6px;width:100%}
+.toc li button:hover{background:var(--paper)}
+.toc li.cur button{font-weight:700;color:var(--pen)}
+.toc .part{list-style:none;margin:10px 0 2px -30px;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--margin);font-weight:700}
+
+/* roadmap */
+.road{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;counter-reset:r}
+.road li{counter-increment:r;display:grid;grid-template-columns:34px 1fr;align-items:center;gap:10px}
+.road li::before{content:counter(r);width:30px;height:30px;border-radius:50%;border:2px solid var(--pen);display:grid;place-items:center;font-family:var(--f-display);font-size:.8rem;color:var(--pen)}
+.road li span{color:var(--ink-2);font-size:.9rem}
+/* before/after demo */
+.sd-cap{margin:30px 0 8px;min-height:1.6em;font-weight:600}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.names ol{margin:4px 0 0;padding-left:22px;font-family:var(--f-mono);font-size:.9rem}
+/* compare & swap */
+.cmp-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.cmp-row .card{width:74px;height:94px;font-size:1.8rem;cursor:default}
+.cmp-op{font-family:var(--f-display);font-size:2rem;min-width:46px;text-align:center;color:var(--pen)}
+.card.big{border-color:var(--swap);background:color-mix(in srgb,var(--swap) 22%,var(--surface))}
+.swap-boxes{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end}
+.sbox{display:flex;flex-direction:column;align-items:center;gap:6px}
+.sbox .card{width:78px;height:92px;font-size:1.8rem;cursor:default}
+.sbox .card.tmp{border-style:dashed}
+.sbox span{font-family:var(--f-mono);font-size:.85rem;color:var(--ink-2)}
+.card.flash{animation:flash .6s}
+@keyframes flash{0%{background:var(--cmp);transform:scale(1.12)}100%{background:var(--surface);transform:scale(1)}}
+.codelines{list-style:none;margin:0;padding:0;font-family:var(--f-mono);font-size:.9rem;display:flex;flex-direction:column;gap:4px}
+.codelines li{padding:5px 10px;border-radius:6px;border:1px solid var(--line);background:var(--code-bg)}
+.codelines li.cur{border-color:var(--pen);box-shadow:0 0 0 2px color-mix(in srgb,var(--pen) 30%,transparent)}
+.codelines li.past{opacity:.55}
+/* quadrant map */
+.quad svg{width:100%;height:auto;display:block}
+.quad text{font-family:var(--f-body);font-size:13px;fill:var(--ink)}
+.quad text.m{fill:var(--muted);font-size:12px}
+/* merge-by-hand & quick tree */
+.grp.cur{border-color:var(--pen);box-shadow:0 0 0 3px color-mix(in srgb,var(--pen) 28%,transparent)}
+.grp.fin{border-color:var(--done)}
+.grp.fin span{background:color-mix(in srgb,var(--done) 16%,var(--surface))}
+.grp.wait{opacity:.5}
+.grp.piv{border-color:var(--done)}
+.grp.piv span{background:var(--done);color:#0E2418;font-weight:700}
+.grp span.pv{box-shadow:inset 0 0 0 2px var(--pivot);background:color-mix(in srgb,var(--pivot) 20%,var(--surface))}
+.groups{display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 14px}
+.pseudo{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pseudo li{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}
+.pseudo li b{font-weight:500}
+.pseudo code{white-space:nowrap}
+
+/* матрёшка */
+.nest{display:grid;place-items:center;padding:6px 0}
+.nbox{border:2px solid var(--pen);border-radius:12px;padding:12px;display:grid;place-items:center;gap:6px;background:var(--surface);min-width:96px}
+.nbox .lbl{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-2);text-align:center}
+.nbox.base{border-color:var(--done);background:color-mix(in srgb,var(--done) 14%,var(--surface))}
+/* очередь */
+.qrow{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;justify-content:center}
+.person{width:64px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.person .fig{width:48px;height:58px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);display:grid;place-items:center;font-family:var(--f-mono);font-size:.82rem;font-weight:600}
+.person.act .fig{border-color:var(--pen);box-shadow:0 0 0 3px color-mix(in srgb,var(--pen) 26%,transparent)}
+.person.base .fig{border-color:var(--done);background:color-mix(in srgb,var(--done) 16%,var(--surface))}
+.person .cap{font-size:.68rem;color:var(--ink-2);text-align:center;min-height:2.2em}
+/* стек вызовов */
+.frames{display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:4px;min-height:210px;border-left:3px solid var(--line);padding:0 0 0 12px}
+.frame{border:1.5px solid var(--pen);border-radius:8px;padding:6px 10px;background:var(--surface);font-family:var(--f-mono);font-size:.8rem;display:flex;justify-content:space-between;gap:12px;animation:pop .25s}
+.frame .st{color:var(--muted)}
+.frame.base{border-color:var(--marker)}
+.frame.ret{border-color:var(--done);background:color-mix(in srgb,var(--done) 12%,var(--surface))}
+.frame.over{border-color:var(--bad);color:var(--bad);justify-content:center}
+@keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+/* дерево вызовов */
+.ftree{overflow-x:auto;padding:4px 0 8px}
+.tn{display:flex;flex-direction:column;align-items:center;gap:6px}
+.tn .kids{display:flex;gap:10px;align-items:flex-start;border-top:1px solid var(--line);padding-top:8px}
+.nb{border:1.5px solid var(--line);border-radius:999px;padding:2px 10px;font-family:var(--f-mono);font-size:.75rem;background:var(--surface);white-space:nowrap}
+.nb.leaf{border-color:var(--done);background:color-mix(in srgb,var(--done) 14%,var(--surface))}
+.nb.dup{border-color:var(--swap);background:color-mix(in srgb,var(--swap) 20%,var(--surface))}
+.nb.memo{border-color:var(--pivot);border-style:dashed;background:color-mix(in srgb,var(--pivot) 14%,var(--surface))}
+/* ханойские башни */
+.pegs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;align-items:end;min-height:180px;margin-bottom:28px}
+.peg{position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;padding:0 4px 8px;border-bottom:4px solid var(--ink-2);border-radius:3px;cursor:pointer;background:none}
+.peg::before{content:"";position:absolute;bottom:4px;width:6px;height:135px;background:var(--line);border-radius:3px}
+.peg.sel{background:color-mix(in srgb,var(--pen) 12%,transparent)}
+.peg .name{position:absolute;bottom:-24px;left:0;right:0;text-align:center;font-family:var(--f-mono);font-size:.82rem;color:var(--ink-2)}
+.disc{height:22px;border-radius:5px;border:1px solid var(--line);position:relative;z-index:1;display:grid;place-items:center;font-family:var(--f-mono);font-size:.72rem;color:var(--ink);transition:transform .2s}
+.disc.lift{transform:translateY(-12px);box-shadow:0 0 0 2px var(--pen)}
+.disc.mv{box-shadow:0 0 0 2px var(--marker)}
+/* демо стека и списка */
+.sd-stack{display:flex;flex-direction:column-reverse;justify-content:flex-start;gap:4px;min-height:160px;border:1.5px dashed var(--line);border-radius:10px;padding:8px;background:var(--paper)}
+.sd-item{border:1.5px solid var(--pen);border-radius:8px;padding:6px 12px;font-family:var(--f-mono);background:var(--surface);text-align:center;animation:pop .25s}
+.sd-item.top{border-color:var(--marker);box-shadow:0 0 0 2px var(--marker)}
+.nodes{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-height:54px}
+.lnode{border:1.5px solid var(--pen);border-radius:8px;padding:6px 11px;font-family:var(--f-mono);background:var(--surface);animation:pop .25s;text-align:center}
+.lnode .tg{display:block;font-size:.62rem;color:var(--ink-2)}
+.arrow{color:var(--muted);font-family:var(--f-mono);font-size:.9rem}
+.out{font-family:var(--f-mono);font-size:.85rem;background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-height:2.6em;white-space:pre-wrap}
+
+/* графы */
+.gwrap svg{width:100%;height:auto;display:block;max-width:440px;margin:0 auto;overflow:visible}
+.gwrap.small svg{max-width:300px}
+.ge{stroke:var(--ink-2);stroke-width:2.5;fill:none;transition:stroke .2s,stroke-width .2s}
+.ge.on{stroke:var(--pen);stroke-width:5}
+.gn{cursor:pointer}
+.gn circle{fill:var(--surface);stroke:var(--pen);stroke-width:2.5;transition:fill .2s}
+.gn text{font-family:var(--f-display);font-size:15px;fill:var(--ink);pointer-events:none}
+.gn.act circle{fill:var(--pen)}
+.gn.act text{fill:var(--pen-ink)}
+.gn.nb circle{fill:var(--marker-soft)}
+.gn.sel circle{fill:var(--done)}
+.gm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+.gmat{border-collapse:collapse;font-family:var(--f-mono);font-size:.85rem;background:var(--surface)}
+.gmat th,.gmat td{border:1px solid var(--line);min-width:34px;height:32px;text-align:center;padding:0 4px}
+.gmat th{background:var(--paper);color:var(--ink-2);font-size:.8rem}
+.gmat td.one{background:color-mix(in srgb,var(--pen) 20%,var(--surface));font-weight:700}
+.gmat td.diag{background:var(--paper);color:var(--muted)}
+.gmat td.hot{outline:2px solid var(--marker);outline-offset:-2px}
+.gmat td.err{background:color-mix(in srgb,var(--bad) 22%,var(--surface))}
+.gmat td.click{cursor:pointer}
+.gmat td.click:hover{outline:2px solid var(--pen);outline-offset:-2px}
+.glist{display:flex;flex-direction:column;gap:6px;font-family:var(--f-mono);font-size:.9rem}
+.glist .grow{display:flex;gap:8px;align-items:center;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);cursor:pointer;text-align:left}
+.glist .grow.on{border-color:var(--pen);box-shadow:0 0 0 2px color-mix(in srgb,var(--pen) 25%,transparent)}
+.glist .grow b{min-width:24px}
+.gchip{border:1px solid var(--line);border-radius:999px;padding:1px 9px;background:var(--paper)}
+
+@media (max-width:860px){
+  .cols,.cols.even,.cols.wide-left,.plan,.grid2,.parsons,.gm-row{grid-template-columns:1fr}
+  .grid3{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  .page{padding-left:34px}
+  .page::before{left:24px}
+  .no{width:20px;font-size:1.3rem;left:-4px}
+  .grid3{grid-template-columns:1fr}
+  .bar .chip{display:none}
+  .nav .kbd,.nav .title{display:none}
+  .nav-in{justify-content:space-between}
+  .viz{height:190px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+</style>
+
+<header class="bar">
+  <span class="brand">Графы <b>на пальцах</b></span>
+  <span class="chip" id="partChip">Раздел 1</span>
+  <span class="spacer"></span>
+  <span class="counter" id="counter">1 / 1</span>
+  <button class="btn ghost" id="tocBtn" type="button">Оглавление</button>
+</header>
+<div class="progress"><i id="prog"></i></div>
+
+<main class="deck" id="deck">
+
+<!-- ═════════ РАЗДЕЛ 1: ЧТО ТАКОЕ ГРАФ ═════════ -->
+<section class="slide" data-part="1" data-title="Обложка и маршрут">
+<div class="page">
+  <p class="eyebrow">Структуры данных · новая тема</p>
+  <h1 class="cover-title">Графы <em>на&nbsp;пальцах</em></h1>
+  <div class="cols">
+    <div>
+      <p class="lead">Точки и связи между ними. Друзья в соцсети, станции метро, дороги между городами — всё это графы.</p>
+      <ol class="road">
+        <li><div><b>Что такое граф</b> <span>— вершины и рёбра</span></div></li>
+        <li><div><b>Матрица смежности</b> <span>— таблица «кто с кем»</span></div></li>
+        <li><div><b>Список смежности</b> <span>— у каждого свой список друзей</span></div></li>
+        <li><div><b>Что выбрать</b> <span>— память против скорости</span></div></li>
+        <li><div><b>Практика</b> <span>— код на Java и мини-тест</span></div></li>
+      </ol>
+    </div>
+    <div class="note">
+      <h3>Кликни по вершине — увидишь её соседей</h3>
+      <div class="graph-demo" data-v="A,B,C,D,E" data-e="A-B,A-D,B-C,B-D,C-E,D-E"></div>
+    </div>
+  </div>
+  <div class="try quiz" data-label="Разминка">
+    <p class="q">Карта метро: кружки — станции, линии между ними — перегоны. Что важнее на такой карте?</p>
+    <div class="opts">
+      <button class="opt" type="button">Точное расстояние в метрах между станциями</button>
+      <button class="opt" type="button" data-ok>Какая станция с какой соединена</button>
+    </div>
+    <p class="fb" data-good="Именно. Схема метро не показывает настоящие расстояния — только связи. Это и есть граф." data-bad="Посмотри на любую схему метро: она нарисована ровными линиями и расстояния там неправильные. Но пересадки показаны точно."></p>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="1" data-title="Вершины и рёбра">
+<div class="page">
+  <p class="eyebrow">Раздел 1 · Что такое граф</p>
+  <h2>Граф — это точки и связи</h2>
+  <div class="cols">
+    <div class="stack">
+      <p class="lead"><mark>Вершина</mark> — объект: человек, город, станция. <mark>Ребро</mark> — связь между двумя вершинами.</p>
+      <ul class="clean">
+        <li><b>Соцсеть:</b> вершины — люди, рёбра — дружба.</li>
+        <li><b>Карта:</b> вершины — города, рёбра — дороги.</li>
+        <li><b>Интернет:</b> вершины — сайты, рёбра — ссылки.</li>
+      </ul>
+      <p class="hand">Как нарисован граф — неважно. Важно только, кто с кем соединён.</p>
+    </div>
+    <div class="note">
+      <h3>Граф группы: кто с кем в одной команде</h3>
+      <div class="graph-demo" data-v="A,B,C,D,E" data-e="A-B,A-D,B-C,B-D,C-E,D-E"></div>
+    </div>
+  </div>
+  <div class="try" data-label="Попробуй сам">
+    <div class="quiz">
+      <p class="q">Сколько рёбер в этом графе? Посчитай линии.</p>
+      <div class="fill"><input type="text" id="g-edges" data-answer="6" inputmode="numeric" aria-label="Число рёбер"><button class="btn" type="button">Проверить</button></div>
+      <p class="fb" data-good="Верно, шесть: A–B, A–D, B–C, B–D, C–E, D–E." data-bad="Считай именно линии, а не кружки. Кликни по каждой вершине — подсветятся её связи."></p>
+    </div>
+    <div class="quiz">
+      <p class="q">Кто соседи вершины D?</p>
+      <div class="opts">
+        <button class="opt" type="button">A и B</button>
+        <button class="opt" type="button" data-ok>A, B и E</button>
+        <button class="opt" type="button">B, C и E</button>
+      </div>
+      <p class="fb" data-good="Верно. Соседи — те вершины, с которыми есть прямое ребро." data-bad="Кликни по D в графе: подсветятся все её рёбра."></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="1" data-title="Словарь темы">
+<div class="page">
+  <p class="eyebrow">Раздел 1 · Что такое граф</p>
+  <h2>Четыре слова, которые нужно запомнить</h2>
+  <div class="grid2">
+    <div class="note"><h3>Вершина (vertex)</h3><p>Один объект графа. На рисунке — кружок. В программе — номер: 0, 1, 2, …</p></div>
+    <div class="note"><h3>Ребро (edge)</h3><p>Связь между двумя вершинами. На рисунке — линия.</p></div>
+    <div class="note"><h3>Соседи</h3><p>Вершины, с которыми есть прямое ребро.</p></div>
+    <div class="note"><h3>Степень вершины</h3><p>Сколько у неё рёбер. У вершины со степенью 0 связей нет вообще.</p></div>
+  </div>
+  <p class="hand" style="margin-top:16px">В коде вершины почти всегда нумеруют с нуля: A → 0, B → 1, C → 2, D → 3, E → 4. Так их удобно класть в массив.</p>
+  <div class="try" data-label="Попробуй сам">
+    <div class="quiz">
+      <p class="q">Чему равна степень вершины B в нашем графе (A–B, A–D, B–C, B–D, C–E, D–E)?</p>
+      <div class="fill"><input type="text" id="g-degb" data-answer="3" inputmode="numeric" aria-label="Степень B"><button class="btn" type="button">Проверить</button></div>
+      <p class="fb" data-good="Верно: B соединена с A, C и D." data-bad="Выпиши все рёбра, где встречается B, и посчитай их."></p>
+    </div>
+    <div class="quiz">
+      <p class="q">Если сложить степени всех вершин, получится 12, а рёбер всего 6. Почему ровно вдвое больше?</p>
+      <div class="opts">
+        <button class="opt" type="button">Случайное совпадение</button>
+        <button class="opt" type="button" data-ok>Каждое ребро считается дважды: у одного конца и у другого</button>
+      </div>
+      <p class="fb" data-good="Верно. Сумма степеней всегда равна удвоенному числу рёбер." data-bad="Ребро A–B добавляет единицу к степени A и единицу к степени B."></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="1" data-title="Какие бывают графы">
+<div class="page">
+  <p class="eyebrow">Раздел 1 · Что такое граф</p>
+  <h2>Два вида, которые встретятся сразу</h2>
+  <div class="cols even">
+    <div class="note">
+      <h3>Неориентированный</h3>
+      <p>Связь взаимная. Дружба: если A друг B, то B друг A. Ребро рисуют простой линией.</p>
+      <div class="graph-demo" data-v="A,B,C" data-e="A-B,B-C" data-small="1"></div>
+    </div>
+    <div class="note">
+      <h3>Ориентированный</h3>
+      <p>Связь в одну сторону. Подписка: ты подписан на блогера, он на тебя — нет. Ребро рисуют стрелкой.</p>
+      <div class="graph-demo" data-v="A,B,C" data-e="A-B,B-C" data-directed="1" data-small="1"></div>
+    </div>
+  </div>
+  <p style="margin-top:14px">Бывают ещё <b>взвешенные</b> графы: на ребре пишут число — расстояние между городами, цену билета, время в пути. Мы пока обойдёмся без весов.</p>
+  <div class="try quiz" data-label="Попробуй сам">
+    <p class="q">Дороги с односторонним движением в городе — это какой граф?</p>
+    <div class="opts">
+      <button class="opt" type="button">Неориентированный</button>
+      <button class="opt" type="button" data-ok>Ориентированный</button>
+    </div>
+    <p class="fb" data-good="Верно: проехать можно только в одну сторону, значит и ребро одностороннее." data-bad="Можно ли по улице с односторонним движением вернуться тем же путём?"></p>
+  </div>
+</div>
+</section>
+
+<!-- ═════════ РАЗДЕЛ 2: МАТРИЦА СМЕЖНОСТИ ═════════ -->
+<section class="slide" data-part="2" data-title="Матрица смежности: идея">
+<div class="page">
+  <p class="eyebrow">Раздел 2 · Матрица смежности</p>
+  <h2>Таблица «кто с кем»</h2>
+  <div class="cols wide-left">
+    <div class="graph-matrix" data-v="A,B,C,D,E" data-e="A-B,A-D,B-C,B-D,C-E,D-E" data-mode="show"></div>
+    <div class="stack">
+      <p class="lead">Рисуем таблицу: строки — вершины, столбцы — они же. На пересечении ставим <b>1</b>, если ребро есть, и <b>0</b>, если нет.</p>
+      <p>Как турнирная таблица: кто с кем играл.</p>
+      <p class="hand">Наведи курсор на ячейку — подсветится соответствующее ребро в графе.</p>
+    </div>
+  </div>
+  <div class="try" data-label="Попробуй сам">
+    <div class="quiz">
+      <p class="q">Что стоит в ячейке на пересечении строки A и столбца C?</p>
+      <div class="opts"><button class="opt" type="button">1</button><button class="opt" type="button" data-ok>0</button></div>
+      <p class="fb" data-good="Верно: прямого ребра A–C нет. Добраться от A до C можно, но только через B — а матрица показывает только прямые связи." data-bad="Посмотри на граф: есть ли линия напрямую между A и C?"></p>
+    </div>
+    <div class="quiz">
+      <p class="q">Почему вся диагональ (A–A, B–B, …) заполнена нулями?</p>
+      <div class="opts">
+        <button class="opt" type="button">Так короче писать</button>
+        <button class="opt" type="button" data-ok>Вершина не соединена сама с собой</button>
+      </div>
+      <p class="fb" data-good="Верно. Петли (ребро из вершины в саму себя) в наших графах не используем." data-bad="Может ли человек быть другом самому себе в списке друзей?"></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="2" data-title="Матрица: заполни сам">
+<div class="page">
+  <p class="eyebrow">Раздел 2 · Матрица смежности · практика</p>
+  <h2>Заполни матрицу по графу</h2>
+  <p>Кликай по ячейкам, чтобы поставить единицу. Матрица симметричная: пара ячеек меняется сразу.</p>
+  <div class="try" data-label="Попробуй сам">
+    <div class="matrix-quiz" data-v="A,B,C,D" data-e="A-B,A-C,B-D,C-D"></div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="2" data-title="Матрица: свойства">
+<div class="page">
+  <p class="eyebrow">Раздел 2 · Матрица смежности</p>
+  <h2>Три свойства, которые проверяют себя сами</h2>
+  <div class="grid3">
+    <div class="note"><h3>Симметрия</h3><p>В неориентированном графе <code>m[a][b] == m[b][a]</code>. Таблица зеркальна относительно диагонали.</p></div>
+    <div class="note"><h3>Нули на диагонали</h3><p><code>m[v][v] = 0</code>: вершина сама с собой не соединена.</p></div>
+    <div class="note"><h3>Сумма строки = степень</h3><p>Сложи единицы в строке B — получишь, сколько у B соседей.</p></div>
+  </div>
+  <p class="hand" style="margin-top:16px">В ориентированном графе симметрии нет: строка — «куда ведут стрелки из вершины», столбец — «откуда приходят».</p>
+  <div class="try" data-label="Попробуй сам">
+    <div class="quiz">
+      <p class="q">В матрице 5×5 сумма всех единиц равна 12. Сколько рёбер в неориентированном графе?</p>
+      <div class="fill"><input type="text" id="g-m12" data-answer="6" inputmode="numeric" aria-label="Число рёбер"><button class="btn" type="button">Проверить</button></div>
+      <p class="fb" data-good="Верно: каждое ребро записано дважды, поэтому 12 / 2 = 6." data-bad="Ребро A–B стоит и в ячейке [A][B], и в [B][A]."></p>
+    </div>
+    <div class="quiz">
+      <p class="q">Сколько ячеек занимает матрица для графа из 1000 вершин?</p>
+      <div class="opts">
+        <button class="opt" type="button">1 000</button>
+        <button class="opt" type="button" data-ok>1 000 000</button>
+        <button class="opt" type="button">2 000</button>
+      </div>
+      <p class="fb" data-good="Верно: n × n = 10⁶ ячеек, даже если рёбер всего десяток. Это главный минус матрицы." data-bad="Матрица квадратная: n строк на n столбцов."></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="2" data-title="Матрица: код на Java">
+<div class="page">
+  <p class="eyebrow">Раздел 2 · Матрица смежности</p>
+  <h2>Матрица на Java</h2>
+  <div class="cols wide-left">
+<pre class="code">int n = 5;                       // вершины 0..4 (A..E)
+int[][] m = new int[n][n];       // все ячейки уже нули
+
+// добавить ребро между a и b
+static void addEdge(int[][] m, int a, int b) {
+    m[a][b] = 1;
+    ⟦m[b][a] = 1;||m[b][a]=1⟧                // связь взаимная
+}
+
+// есть ли ребро между a и b — сразу, за один шаг
+static boolean hasEdge(int[][] m, int a, int b) {
+    return ⟦m[a][b] == 1||m[a][b]==1⟧;
+}
+
+// вывести всех соседей вершины v
+static void printNeighbors(int[][] m, int v) {
+    for (int u = 0; u &lt; m.length; u++) {
+        if (m[v][u] == 1) System.out.print(u + " ");
+    }
+}</pre>
+    <div class="stack">
+      <div class="note"><h3>Вершины — это индексы</h3><p>A = 0, B = 1, C = 2, D = 3, E = 4. Никаких букв в коде нет.</p></div>
+      <div class="note"><h3>Вторая строка в addEdge</h3><p>Для ориентированного графа её просто убирают — остаётся стрелка в одну сторону.</p></div>
+      <div class="note"><h3>Соседи</h3><p>Чтобы найти соседей, приходится пробежать <b>всю строку</b> — n шагов, даже если сосед всего один.</p></div>
+    </div>
+  </div>
+  <div class="try" data-label="Попробуй сам">
+    <div class="quiz">
+      <p class="q">Как в main создать граф A–B и A–D из примера?</p>
+      <div class="opts">
+        <button class="opt" type="button" data-ok>addEdge(m, 0, 1); addEdge(m, 0, 3);</button>
+        <button class="opt" type="button">addEdge(m, A, B); addEdge(m, A, D);</button>
+        <button class="opt" type="button">m[A][B] = 1;</button>
+      </div>
+      <p class="fb" data-good="Верно: буквы существуют только на доске, в коде это номера." data-bad="A = 0, B = 1, C = 2, D = 3, E = 4."></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═════════ РАЗДЕЛ 3: СПИСОК СМЕЖНОСТИ ═════════ -->
+<section class="slide" data-part="3" data-title="Список смежности: идея">
+<div class="page">
+  <p class="eyebrow">Раздел 3 · Список смежности</p>
+  <h2>У каждой вершины — свой список друзей</h2>
+  <div class="cols wide-left">
+    <div class="graph-list" data-v="A,B,C,D,E" data-e="A-B,A-D,B-C,B-D,C-E,D-E"></div>
+    <div class="stack">
+      <p class="lead">Вместо большой таблицы храним для каждой вершины <mark>только её соседей</mark>.</p>
+      <p>Как контакты в телефоне: у каждого человека свой небольшой список, а не таблица со всеми жителями страны.</p>
+      <p class="hand">Кликни по строке списка — подсветится вершина и её рёбра.</p>
+    </div>
+  </div>
+  <div class="try" data-label="Попробуй сам">
+    <div class="quiz">
+      <p class="q">Сколько всего чисел записано во всём списке смежности этого графа?</p>
+      <div class="fill"><input type="text" id="g-list12" data-answer="12" inputmode="numeric" aria-label="Сколько чисел"><button class="btn" type="button">Проверить</button></div>
+      <p class="fb" data-good="Верно: каждое из 6 рёбер записано дважды — в списке одного конца и в списке другого. 6 × 2 = 12." data-bad="Сложи длины всех пяти строк списка."></p>
+    </div>
+    <div class="quiz">
+      <p class="q">Чтобы узнать, есть ли ребро между A и E, что придётся сделать?</p>
+      <div class="opts">
+        <button class="opt" type="button">Посмотреть одну ячейку</button>
+        <button class="opt" type="button" data-ok>Просмотреть список A до конца и не найти там E</button>
+      </div>
+      <p class="fb" data-good="Верно. Это минус списка: проверка ребра требует просмотра, а не одного взгляда." data-bad="В списке нет таблицы с готовым ответом — есть только перечень соседей."></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="3" data-title="Список: собери сам">
+<div class="page">
+  <p class="eyebrow">Раздел 3 · Список смежности · практика</p>
+  <h2>Собери список по графу</h2>
+  <p>Для каждой вершины кликай по её соседям прямо в графе, потом жми «Готово».</p>
+  <div class="try" data-label="Попробуй сам">
+    <div class="list-quiz" data-v="A,B,C,D" data-e="A-B,A-C,B-D,C-D"></div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="3" data-title="Список: код на Java">
+<div class="page">
+  <p class="eyebrow">Раздел 3 · Список смежности</p>
+  <h2>Список на Java</h2>
+  <div class="cols wide-left">
+<pre class="code">import java.util.ArrayList;
+import java.util.List;
+
+int n = 5;
+List&lt;List&lt;Integer&gt;&gt; g = new ArrayList&lt;&gt;();
+for (int i = 0; i &lt; n; i++) {
+    g.add(new ArrayList&lt;&gt;());      // пустой список соседей
+}
+
+static void addEdge(List&lt;List&lt;Integer&gt;&gt; g, int a, int b) {
+    g.get(a).add(b);
+    ⟦g.get(b).add(a);||g.get(b).add(a)⟧             // связь взаимная
+}
+
+static void printNeighbors(List&lt;List&lt;Integer&gt;&gt; g, int v) {
+    for (int u : ⟦g.get(v)⟧) {
+        System.out.print(u + " ");
+    }
+}</pre>
+    <div class="stack">
+      <div class="note"><h3><code>List&lt;List&lt;Integer&gt;&gt;</code></h3><p>Список списков: <code>g.get(3)</code> — это список соседей вершины 3.</p></div>
+      <div class="note"><h3>Цикл по соседям</h3><p><code>for (int u : g.get(v))</code> проходит <b>только</b> по соседям, а не по всем вершинам.</p></div>
+      <div class="note"><h3>Можно проще</h3><p>Если не хочется дженериков: <code>List&lt;Integer&gt;[] g = new List[n];</code> и <code>g[i] = new ArrayList&lt;&gt;();</code></p></div>
+    </div>
+  </div>
+  <div class="try quiz" data-label="Попробуй сам">
+    <p class="q">Что напечатает <code>printNeighbors(g, 1)</code> для нашего графа (B соединена с A, C, D)?</p>
+    <div class="opts">
+      <button class="opt" type="button">1 1 1</button>
+      <button class="opt" type="button" data-ok>0 2 3</button>
+      <button class="opt" type="button">A C D</button>
+    </div>
+    <p class="fb" data-good="Верно: A = 0, C = 2, D = 3. Порядок — тот, в котором добавляли рёбра." data-bad="Вершина 1 — это B. Переведи её соседей A, C, D в номера."></p>
+  </div>
+</div>
+</section>
+
+<!-- ═════════ РАЗДЕЛ 4: ЧТО ВЫБРАТЬ ═════════ -->
+<section class="slide" data-part="4" data-title="Матрица против списка">
+<div class="page">
+  <p class="eyebrow">Раздел 4 · Что выбрать</p>
+  <h2>Матрица против списка</h2>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Операция</th><th>Матрица <span class="o">n × n</span></th><th>Список</th></tr></thead>
+      <tbody>
+        <tr><td>Память</td><td class="o">n²</td><td class="o">n + 2m <span class="tag-good">меньше</span></td></tr>
+        <tr><td>Есть ли ребро a–b?</td><td class="o">O(1) <span class="tag-good">сразу</span></td><td class="o">O(степени)</td></tr>
+        <tr><td>Перебрать соседей v</td><td class="o">O(n) — вся строка</td><td class="o">O(степени) <span class="tag-good">только нужное</span></td></tr>
+        <tr><td>Добавить ребро</td><td class="o">O(1)</td><td class="o">O(1)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="margin-top:6px;font-size:.9rem;color:var(--ink-2)">n — число вершин, m — число рёбер, степень — сколько соседей у вершины.</p>
+  <div class="cols even" style="margin-top:16px">
+    <div class="note"><h3>Соцсеть: 1 000 000 человек, у каждого ~100 друзей</h3>
+      <p><b>Матрица:</b> 10¹² ячеек — около терабайта памяти.<br>
+      <b>Список:</b> 10⁸ чисел — около 400 мегабайт.</p></div>
+    <p class="hand">Почти все настоящие графы разреженные: вершин много, а рёбер у каждой мало. Поэтому в реальных программах чаще берут список.</p>
+  </div>
+  <div class="try quiz" data-label="Попробуй сам">
+    <p class="q">Почему матрица тратит терабайт, если друзей всего по сотне?</p>
+    <div class="opts">
+      <button class="opt" type="button">Потому что числа большие</button>
+      <button class="opt" type="button" data-ok>Она хранит все пары людей, включая незнакомых — и пишет им нули</button>
+    </div>
+    <p class="fb" data-good="Верно. Матрица платит за каждую возможную пару, даже если связи нет." data-bad="Матрица заводит ячейку для КАЖДОЙ пары вершин. Сколько таких пар при миллионе человек?"></p>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="4" data-title="Когда что выбирать">
+<div class="page">
+  <p class="eyebrow">Раздел 4 · Что выбрать</p>
+  <h2>Простое правило</h2>
+  <div class="cols even">
+    <div class="note"><h3>Бери матрицу, если…</h3>
+      <ul class="clean">
+        <li>вершин мало (десятки);</li>
+        <li>рёбер много — почти все со всеми;</li>
+        <li>главное действие — «есть ли ребро между a и b?».</li>
+      </ul></div>
+    <div class="note"><h3>Бери список, если…</h3>
+      <ul class="clean">
+        <li>вершин много (тысячи и больше);</li>
+        <li>рёбер мало — граф разреженный;</li>
+        <li>главное действие — «обойти всех соседей».</li>
+      </ul></div>
+  </div>
+  <div class="try" data-label="Попробуй сам">
+    <div class="quiz">
+      <p class="q">Турнир: 8 команд, каждая играет с каждой. Что удобнее?</p>
+      <div class="opts"><button class="opt" type="button" data-ok>Матрица</button><button class="opt" type="button">Список</button></div>
+      <p class="fb" data-good="Верно: вершин мало, рёбер максимум, и удобно смотреть «играли ли эти двое»." data-bad="Вершин всего 8, а рёбер почти все возможные. Матрица 8×8 — это 64 ячейки."></p>
+    </div>
+    <div class="quiz">
+      <p class="q">Карта дорог страны: 50 000 городов, у каждого 3–4 соседних. Что удобнее?</p>
+      <div class="opts"><button class="opt" type="button">Матрица</button><button class="opt" type="button" data-ok>Список</button></div>
+      <p class="fb" data-good="Верно: матрица заняла бы 2,5 миллиарда ячеек почти из одних нулей." data-bad="Посчитай 50 000 × 50 000 ячеек — и сравни с 200 000 чисел в списке."></p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═════════ РАЗДЕЛ 5: ПРАКТИКА ═════════ -->
+<section class="slide" data-part="5" data-title="Собери код">
+<div class="page">
+  <p class="eyebrow">Раздел 5 · Практика</p>
+  <h2>Собери программу из строк</h2>
+  <p>Создание графа на матрице и вывод соседей вершины 1.</p>
+  <div class="try" data-label="Собери код">
+    <div class="parsons">
+<script type="text/plain">public class Main {
+    public static void main(String[] args) {
+        int n = 5;
+        int[][] m = new int[n][n];
+        addEdge(m, 0, 1);
+        addEdge(m, 0, 3);
+        addEdge(m, 1, 2);
+        printNeighbors(m, 1);
+    }
+    static void addEdge(int[][] m, int a, int b) {
+        m[a][b] = 1;
+        m[b][a] = 1;
+    }
+    static void printNeighbors(int[][] m, int v) {
+        for (int u = 0; u < m.length; u++) {
+            if (m[v][u] == 1) System.out.print(u + " ");
+        }
+    }
+}</script>
+    </div>
+  </div>
+</div>
+</section>
+
+<section class="slide" data-part="5" data-title="Мини-тест и шпаргалка">
+<div class="page">
+  <p class="eyebrow">Итог темы</p>
+  <h2>Шпаргалка и мини-тест</h2>
+  <div class="grid2">
+    <div class="note"><h3>Граф</h3><p>Вершины (объекты) + рёбра (связи). Степень вершины — число её рёбер. Сумма степеней = 2 × число рёбер.</p></div>
+    <div class="note"><h3>Два способа хранить</h3><p><b>Матрица:</b> <code>int[][] m</code>, <code>m[a][b] = 1</code>.<br><b>Список:</b> <code>List&lt;List&lt;Integer&gt;&gt; g</code>, <code>g.get(a).add(b)</code>.</p></div>
+  </div>
+  <p style="margin-top:14px">Считается первый ответ. Результат: <span class="score" data-group="final">0 / 5</span></p>
+  <div class="try" data-label="Мини-тест">
+    <div class="quiz" data-group="final">
+      <p class="q">1. Что такое степень вершины?</p>
+      <div class="opts"><button class="opt" type="button" data-ok>Число рёбер у этой вершины</button><button class="opt" type="button">Номер вершины</button><button class="opt" type="button">Длина пути до соседа</button></div>
+      <p class="fb" data-good="Верно." data-bad="Посчитай линии, выходящие из кружка."></p>
+    </div>
+    <div class="quiz" data-group="final">
+      <p class="q">2. Сколько памяти занимает матрица смежности для n вершин?</p>
+      <div class="opts"><button class="opt" type="button">n</button><button class="opt" type="button" data-ok>n²</button><button class="opt" type="button">2m</button></div>
+      <p class="fb" data-good="Верно, квадрат числа вершин." data-bad="Таблица n строк на n столбцов."></p>
+    </div>
+    <div class="quiz" data-group="final">
+      <p class="q">3. В неориентированном графе добавили ребро 2–4. Что изменится в матрице?</p>
+      <div class="opts"><button class="opt" type="button">Только m[2][4] = 1</button><button class="opt" type="button" data-ok>Сразу две ячейки: m[2][4] = 1 и m[4][2] = 1</button></div>
+      <p class="fb" data-good="Верно — матрица симметрична." data-bad="Связь взаимная, поэтому и в матрице она записана с обеих сторон."></p>
+    </div>
+    <div class="quiz" data-group="final">
+      <p class="q">4. Что быстрее отвечает на вопрос «есть ли ребро между a и b»?</p>
+      <div class="opts"><button class="opt" type="button" data-ok>Матрица — одна ячейка</button><button class="opt" type="button">Список — надо просмотреть соседей</button></div>
+      <p class="fb" data-good="Верно, это главный плюс матрицы." data-bad="В матрице ответ лежит в готовой ячейке m[a][b]."></p>
+    </div>
+    <div class="quiz" data-group="final">
+      <p class="q">5. Соцсеть на миллион человек. Что выбрать?</p>
+      <div class="opts"><button class="opt" type="button">Матрицу</button><button class="opt" type="button" data-ok>Список смежности</button></div>
+      <p class="fb" data-good="Верно: граф разреженный, матрица съела бы терабайт." data-bad="Вершин очень много, а друзей у каждого мало."></p>
+    </div>
+  </div>
+</div>
+</section>
+
+</main>
+
+<nav class="nav" aria-label="Навигация по слайдам">
+  <div class="nav-in">
+    <button class="btn" id="prevBtn" type="button">← Назад</button>
+    <span class="title" id="navTitle"></span>
+    <span class="kbd">←</span><span class="kbd">→</span>
+    <button class="btn primary" id="nextBtn" type="button">Дальше →</button>
+  </div>
+</nav>
+
+<dialog class="toc" id="toc">
+  <div class="toc-head"><b>Оглавление</b><button class="btn ghost" type="button" id="tocClose">Закрыть</button></div>
+  <ol id="tocList"></ol>
+</dialog>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const norm = s => String(s).toLowerCase().replace(/ё/g, "е").replace(/\s+/g, "").replace(/;+$/, "");
+const fmt = x => Math.round(x).toLocaleString("ru-RU");
+let uid = 0;
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+};
+function uniq(n, max) {
+  const pool = Array.from({ length: max }, (_, i) => i + 1);
+  for (let i = pool.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [pool[i], pool[j]] = [pool[j], pool[i]]; }
+  return pool.slice(0, n);
+}
+function h(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+
+/* slide hooks */
+const showHooks = new Map();
+const pauseHooks = [];
+function onShow(el, fn) { const s = el.closest(".slide"); if (!s) return; if (!showHooks.has(s)) showHooks.set(s, []); showHooks.get(s).push(fn); }
+
+/* ═════════ ALGORITHM RECORDERS ═════════ */
+function rec(vals) {
+  const a = vals.map((v, id) => ({ v, id }));
+  const S = [], st = { cmp: 0, swp: 0 }, done = new Set();
+  const push = (o = {}) => S.push({ a: a.slice(), hl: o.hl || {}, done: [...done], note: o.note || "", ptr: o.ptr || {}, range: o.range || null, cmp: st.cmp, swp: st.swp });
+  const sw = (i, j) => { const t = a[i]; a[i] = a[j]; a[j] = t; };
+  return { a, S, st, done, push, sw };
+}
+const zone = (h, from, to, cls) => { for (let k = from; k <= to; k++) h[k] = cls; return h; };
+
+const ALG = {
+  bubble(vals) {
+    const { a, S, st, done, push, sw } = rec(vals), n = a.length;
+    push({ note: "Начальный массив. Жми «Шаг»." });
+    for (let i = 0; i < n - 1; i++) {
+      let swapped = false;
+      for (let j = 0; j < n - 1 - i; j++) {
+        st.cmp++;
+        push({ hl: { [j]: "cmp", [j + 1]: "cmp" }, ptr: { j }, note: `Проход ${i + 1}: сравниваем соседей ${a[j].v} и ${a[j + 1].v}` });
+        if (a[j].v > a[j + 1].v) {
+          sw(j, j + 1); st.swp++; swapped = true;
+          push({ hl: { [j]: "swap", [j + 1]: "swap" }, ptr: { j }, note: `${a[j + 1].v} > ${a[j].v} — меняем местами` });
+        } else {
+          push({ hl: { [j]: "ok", [j + 1]: "ok" }, ptr: { j }, note: `${a[j].v} < ${a[j + 1].v} — порядок верный, идём дальше` });
+        }
+      }
+      done.add(n - 1 - i);
+      push({ note: `Проход ${i + 1} закончен: ${a[n - 1 - i].v} «всплыл» на своё место` });
+      if (!swapped) { for (let k = 0; k < n; k++) done.add(k); push({ note: "За проход не было ни одного обмена — массив уже отсортирован, выходим раньше" }); break; }
+    }
+    for (let k = 0; k < n; k++) done.add(k);
+    push({ note: `Готово! Сравнений: ${st.cmp}, обменов: ${st.swp}` });
+    return S;
+  },
+  selection(vals) {
+    const { a, S, st, done, push, sw } = rec(vals), n = a.length;
+    push({ note: "Начальный массив" });
+    for (let i = 0; i < n - 1; i++) {
+      let m = i;
+      push({ hl: { [i]: "pivot" }, ptr: { i }, note: `Ищем минимум, начиная с позиции ${i}. Пока минимум = ${a[i].v}` });
+      for (let j = i + 1; j < n; j++) {
+        st.cmp++;
+        push({ hl: { [m]: "pivot", [j]: "cmp" }, ptr: { i, j }, note: `${a[j].v} меньше ${a[m].v}?` });
+        if (a[j].v < a[m].v) { m = j; push({ hl: { [m]: "pivot" }, ptr: { i, j }, note: `Да — новый минимум ${a[m].v}` }); }
+      }
+      if (m !== i) { sw(i, m); st.swp++; }
+      done.add(i);
+      push({ hl: { [i]: "swap" }, ptr: { i }, note: `Ставим минимум ${a[i].v} на позицию ${i}` });
+    }
+    for (let k = 0; k < n; k++) done.add(k);
+    push({ note: `Готово! Сравнений: ${st.cmp}, обменов: ${st.swp}` });
+    return S;
+  },
+  insertion(vals) {
+    const { a, S, st, done, push, sw } = rec(vals), n = a.length;
+    push({ hl: { 0: "ok" }, note: "Первый элемент сам по себе — уже упорядоченная часть" });
+    for (let i = 1; i < n; i++) {
+      push({ hl: zone({ [i]: "cmp" }, 0, i - 1, "ok"), ptr: { i }, note: `Берём ${a[i].v} и вставляем в упорядоченную левую часть` });
+      let j = i;
+      while (j > 0) {
+        st.cmp++;
+        const hl = zone({}, 0, i, "ok"); hl[j - 1] = "cmp"; hl[j] = "cmp";
+        push({ hl, ptr: { j }, note: `${a[j - 1].v} больше ${a[j].v}?` });
+        if (a[j - 1].v > a[j].v) {
+          sw(j - 1, j); st.swp++;
+          const h2 = zone({}, 0, i, "ok"); h2[j - 1] = "swap";
+          push({ hl: h2, ptr: { j: j - 1 }, note: "Да — сдвигаем левее" });
+          j--;
+        } else { push({ hl: zone({}, 0, i, "ok"), note: "Нет — место найдено" }); break; }
+      }
+    }
+    for (let k = 0; k < n; k++) done.add(k);
+    push({ note: `Готово! Сравнений: ${st.cmp}, сдвигов: ${st.swp}` });
+    return S;
+  },
+  merge(vals) {
+    const { a, S, st, done, push } = rec(vals), n = a.length;
+    push({ note: "Начальный массив" });
+    (function ms(l, r) {
+      if (l >= r) return;
+      const m = (l + r) >> 1;
+      push({ range: [l, r], note: `Делим кусок ${l}–${r} пополам: ${l}–${m} и ${m + 1}–${r}` });
+      ms(l, m); ms(m + 1, r);
+      let i = l, j = m + 1, em = m;
+      push({ range: [l, r], hl: zone(zone({}, l, m, "ok"), m + 1, r, "less"), note: `Обе половины отсортированы. Сливаем ${l}–${m} и ${m + 1}–${r}` });
+      while (i <= em && j <= r) {
+        st.cmp++;
+        const hl = zone({}, l, i - 1, "ok"); hl[i] = "cmp"; hl[j] = "cmp";
+        push({ range: [l, r], hl, ptr: { i, j }, note: `Сравниваем головы половин: ${a[i].v} и ${a[j].v}` });
+        if (a[i].v <= a[j].v) {
+          push({ range: [l, r], hl: zone({}, l, i, "ok"), ptr: { i, j }, note: `${a[i].v} меньше — остаётся на месте` });
+          i++;
+        } else {
+          const x = a.splice(j, 1)[0]; a.splice(i, 0, x); st.swp++;
+          push({ range: [l, r], hl: zone(zone({}, l, i - 1, "ok"), i, i, "swap"), ptr: { i }, note: `${x.v} меньше — переносим вперёд, остальные сдвигаются` });
+          i++; em++; j++;
+        }
+      }
+      push({ range: [l, r], hl: zone({}, l, r, "ok"), note: `Кусок ${l}–${r} слит: [${a.slice(l, r + 1).map(o => o.v).join(", ")}]` });
+    })(0, n - 1);
+    for (let k = 0; k < n; k++) done.add(k);
+    push({ note: `Готово! Сравнений: ${st.cmp}, переносов: ${st.swp}` });
+    return S;
+  },
+  quick(vals) {
+    const { a, S, st, done, push, sw } = rec(vals), n = a.length;
+    push({ note: "Начальный массив" });
+    (function qs(l, r) {
+      if (l > r) return;
+      if (l === r) { done.add(l); return; }
+      const p = a[r].v;
+      push({ range: [l, r], hl: { [r]: "pivot" }, note: `Кусок ${l}–${r}. Опорный (pivot) = ${p} — последний элемент` });
+      let i = l - 1;
+      const base = () => { const o = zone({}, l, i, "less"); o[r] = "pivot"; return o; };
+      const ptr = j => (i >= l ? { i, j } : { j });
+      for (let j = l; j < r; j++) {
+        st.cmp++;
+        const h1 = base(); h1[j] = "cmp";
+        push({ range: [l, r], hl: h1, ptr: ptr(j), note: `${a[j].v} меньше ${p}?` });
+        if (a[j].v < p) {
+          i++;
+          const moved = i !== j;
+          if (moved) { sw(i, j); st.swp++; }
+          const h2 = base(); h2[i] = "swap";
+          push({ range: [l, r], hl: h2, ptr: ptr(j), note: moved ? `Да → i = ${i}, меняем a[${i}] и a[${j}]` : `Да → i = ${i}, элемент уже стоит в зоне «меньше»` });
+        } else {
+          push({ range: [l, r], hl: base(), ptr: ptr(j), note: `Нет → ${a[j].v} остаётся справа` });
+        }
+      }
+      if (i + 1 !== r) { sw(i + 1, r); st.swp++; }
+      done.add(i + 1);
+      push({ range: [l, r], hl: zone({}, l, i, "less"), note: `Ставим pivot ${p} на позицию ${i + 1}: слева меньше, справа больше. Он на месте навсегда` });
+      qs(l, i); qs(i + 2, r);
+    })(0, n - 1);
+    for (let k = 0; k < n; k++) done.add(k);
+    push({ note: `Готово! Сравнений: ${st.cmp}, обменов: ${st.swp}` });
+    return S;
+  },
+  bsearch(vals, t) {
+    const { a, S, st, done, push } = rec(vals), n = a.length;
+    let lo = 0, hi = n - 1;
+    push({ range: [lo, hi], ptr: { lo, hi }, note: `Ищем ${t}. Пока число может быть где угодно: lo = 0, hi = ${hi}` });
+    while (lo <= hi) {
+      const mid = lo + ((hi - lo) >> 1);
+      st.cmp++;
+      push({ range: [lo, hi], hl: { [mid]: "cmp" }, ptr: { lo, mid, hi }, note: `Шаг ${st.cmp}: mid = ${mid}, a[mid] = ${a[mid].v}. Сравниваем с ${t}` });
+      if (a[mid].v === t) { done.add(mid); push({ ptr: { mid }, note: `Нашли! ${t} стоит на индексе ${mid}. Понадобилось шагов: ${st.cmp}` }); return S; }
+      if (a[mid].v < t) { lo = mid + 1; push({ range: [lo, hi], ptr: lo <= hi ? { lo, hi } : {}, note: `${a[mid].v} < ${t} → левую половину выбрасываем, lo = ${lo}` }); }
+      else { hi = mid - 1; push({ range: [lo, hi], ptr: lo <= hi ? { lo, hi } : {}, note: `${a[mid].v} > ${t} → правую половину выбрасываем, hi = ${hi}` }); }
+    }
+    push({ range: [1, 0], note: `lo > hi — искать больше негде. Числа ${t} нет, возвращаем -1. Шагов: ${st.cmp}` });
+    return S;
+  }
+};
+const NAMES = { bubble: "Пузырьком", merge: "Слиянием", quick: "Быстрая", selection: "Выбором", insertion: "Вставками" };
+
+/* ═════════ BAR RENDERER ═════════ */
+function makeViz(viz, opts = {}) {
+  const items = new Map(), idxs = [], ptrs = [];
+  let bracket = null;
+  function ensure(step) {
+    step.a.forEach(o => { if (!items.has(o.id)) { const d = h("div", "it"); viz.appendChild(d); items.set(o.id, d); } });
+    if (opts.idx && idxs.length !== step.a.length) {
+      idxs.forEach(e => e.remove()); idxs.length = 0;
+      step.a.forEach((_, i) => { const e = h("div", "idx", String(i)); viz.appendChild(e); idxs.push(e); });
+    }
+    if (!bracket && !opts.noBracket) { bracket = h("div", "bracket"); viz.appendChild(bracket); }
+  }
+  function reset() { viz.innerHTML = ""; items.clear(); idxs.length = 0; ptrs.length = 0; bracket = null; }
+  function draw(step) {
+    ensure(step);
+    const W = viz.clientWidth, H = viz.clientHeight;
+    if (!W) return;
+    const n = step.a.length, slot = W / n, bw = Math.max(2, slot * (opts.cells ? 0.86 : 0.78));
+    const max = Math.max(...step.a.map(o => o.v));
+    const bottom = opts.flat ? 0 : 26, avail = H - bottom - 14;
+    const [rl, rr] = step.range || [0, n - 1];
+    step.a.forEach((o, pos) => {
+      const d = items.get(o.id);
+      d.style.width = bw + "px";
+      d.style.transform = `translateX(${pos * slot + (slot - bw) / 2}px)`;
+      if (!opts.cells) d.style.height = Math.max(6, 8 + (o.v / max) * (avail - 8)) + "px";
+      d.textContent = opts.nolabel ? "" : o.v;
+      let cls = step.hl[pos] || (step.done.includes(pos) ? "done" : "");
+      if (!cls && step.range && (pos < rl || pos > rr)) cls = "dim";
+      d.className = "it" + (cls ? " " + cls : "");
+    });
+    idxs.forEach((e, i) => { e.style.width = slot + "px"; e.style.left = i * slot + "px"; });
+    if (bracket) {
+      if (step.range && rr >= rl && !(rl === 0 && rr === n - 1 && !opts.cells)) {
+        bracket.style.display = "block"; bracket.style.left = rl * slot + 3 + "px"; bracket.style.width = (rr - rl + 1) * slot - 6 + "px";
+      } else bracket.style.display = "none";
+    }
+    const byPos = {};
+    Object.entries(step.ptr).forEach(([name, pos]) => { if (pos >= 0 && pos < n) (byPos[pos] = byPos[pos] || []).push(name); });
+    const entries = Object.entries(byPos);
+    while (ptrs.length < entries.length) { const e = h("div", "ptr"); viz.appendChild(e); ptrs.push(e); }
+    ptrs.forEach((e, k) => {
+      if (k < entries.length) { const [pos, names] = entries[k]; e.style.display = "block"; e.style.width = slot + "px"; e.style.left = "0"; e.style.transform = `translateX(${pos * slot}px)`; e.textContent = names.join("·"); }
+      else e.style.display = "none";
+    });
+  }
+  return { draw, reset };
+}
+
+/* ═════════ PLAYER ═════════ */
+function initPlayer(el) {
+  const algo = el.dataset.algo, cells = el.dataset.mode === "cells", loop = el.dataset.auto === "loop";
+  const nolabel = !!el.dataset.nolabel;
+  let vals = el.dataset.arr ? el.dataset.arr.split(",").map(Number) : uniq(+el.dataset.n || 10, 99);
+  let target = +el.dataset.target || 0;
+  const viz = h("div", "viz" + (cells ? " cells" : "") + (el.dataset.short ? " short" : "") + (nolabel ? " nolabel" : ""));
+  el.appendChild(viz);
+  const R = makeViz(viz, { cells, nolabel, idx: !nolabel && vals.length <= 16 });
+  let steps = [], k = 0, timer = null, speed = 700;
+  let note, stats, bBack, bStep, bPlay;
+  const compute = () => { steps = ALG[algo](vals, target); k = 0; };
+  compute();
+  if (!loop) {
+    note = h("p", "pnote"); note.setAttribute("aria-live", "polite");
+    stats = h("div", "stats");
+    const row = h("div", "row");
+    const id = "speed-" + (uid++);
+    row.innerHTML = `<button class="btn ghost" type="button" data-a="reset">⟲ Сначала</button>
+      <button class="btn" type="button" data-a="back">◀ Назад</button>
+      <button class="btn primary" type="button" data-a="step">Шаг ▶</button>
+      <button class="btn" type="button" data-a="play">▶ Авто</button>
+      <label class="sr" for="${id}" style="position:absolute;left:-9999px">Скорость</label>
+      <select class="speed" id="${id}"><option value="1100">медленно</option><option value="700" selected>нормально</option><option value="250">быстро</option></select>`;
+    if (algo === "bsearch") {
+      const tid = "target-" + (uid++);
+      row.insertAdjacentHTML("beforeend", `<span class="fill"><label for="${tid}">Ищем:</label><input type="text" inputmode="numeric" id="${tid}" value="${target}" style="width:6ch"><button class="btn ghost" type="button" data-a="find">Искать</button></span>`);
+    } else {
+      row.insertAdjacentHTML("beforeend", `<button class="btn ghost" type="button" data-a="new">Новый массив</button>`);
+    }
+    el.append(note, stats, row);
+    bBack = $('[data-a="back"]', row); bStep = $('[data-a="step"]', row); bPlay = $('[data-a="play"]', row);
+    $("select", row).addEventListener("change", e => { speed = +e.target.value; if (timer) { stop(); play(); } });
+    row.addEventListener("click", e => {
+      const a = e.target.closest("button")?.dataset.a; if (!a) return;
+      if (a === "reset") { stop(); k = 0; render(); }
+      if (a === "back") { stop(); k = Math.max(0, k - 1); render(); }
+      if (a === "step") { stop(); k = Math.min(steps.length - 1, k + 1); render(); }
+      if (a === "play") { timer ? stop() : play(); }
+      if (a === "new") { stop(); vals = uniq(vals.length, 99); R.reset(); compute(); render(); }
+      if (a === "find") {
+        const v = parseInt($("input", row).value, 10);
+        if (Number.isNaN(v)) { note.textContent = "Впиши целое число, которое будем искать."; return; }
+        stop(); target = v; R.reset(); compute(); render();
+      }
+    });
+    $("input", row)?.addEventListener("keydown", e => { if (e.key === "Enter") $('[data-a="find"]', row).click(); });
+  }
+  function render() {
+    const s = steps[k]; R.draw(s);
+    if (loop) return;
+    note.textContent = s.note;
+    const label2 = algo === "merge" ? "переносов" : algo === "insertion" ? "сдвигов" : "обменов";
+    stats.innerHTML = algo === "bsearch"
+      ? `<span>Шагов поиска: <b>${s.cmp}</b></span><span>Кадр <b>${k + 1}</b> из ${steps.length}</span>`
+      : `<span>Сравнений: <b>${s.cmp}</b></span><span>${label2[0].toUpperCase() + label2.slice(1)}: <b>${s.swp}</b></span><span>Кадр <b>${k + 1}</b> из ${steps.length}</span>`;
+    bBack.disabled = k === 0; bStep.disabled = k === steps.length - 1;
+  }
+  function play() {
+    if (k >= steps.length - 1) k = 0;
+    if (bPlay) bPlay.textContent = "❚❚ Пауза";
+    timer = setInterval(() => {
+      if (k < steps.length - 1) { k++; render(); return; }
+      if (loop) { stop(); timer = setTimeout(() => { vals = uniq(vals.length, 99); R.reset(); compute(); render(); play(); }, 1600); return; }
+      stop();
+    }, loop ? 140 : speed);
+  }
+  function stop() { clearInterval(timer); clearTimeout(timer); timer = null; if (bPlay) bPlay.textContent = "▶ Авто"; }
+  pauseHooks.push(stop);
+  onShow(el, () => { render(); if (loop && !REDUCED && !timer) play(); });
+  window.addEventListener("resize", () => { if (!el.closest(".slide").hidden) render(); });
+}
+
+/* ═════════ RACE ═════════ */
+function initRace(el) {
+  const n = +el.dataset.n || 30;
+  const specs = el.dataset.lanes.split(",").map(s => { const [algo, kind] = s.split(":"); return { algo, kind }; });
+  const mixedKinds = new Set(specs.map(s => s.kind)).size > 1;
+  let lanes = [], timer = null, finishOrder = 0;
+  const box = h("div", "race");
+  const ctr = h("div", "row", `<button class="btn primary" type="button" data-a="go">▶ Старт</button><button class="btn ghost" type="button" data-a="new">Новая гонка</button>`);
+  el.classList.remove("race");
+  el.append(ctr, box);
+  function build() {
+    box.innerHTML = ""; finishOrder = 0;
+    const base = uniq(n, n * 3), sorted = base.slice().sort((x, y) => x - y);
+    lanes = specs.map(sp => {
+      const vals = sp.kind === "sorted" ? sorted : base;
+      const lane = h("div", "lane");
+      const label = NAMES[sp.algo] + (mixedKinds ? (sp.kind === "sorted" ? " · уже отсортированный массив" : " · случайный массив") : "");
+      lane.innerHTML = `<div class="lane-head"><span>${label}</span><span>шагов: <b>0</b> <span class="place"></span></span></div>`;
+      const viz = h("div", "viz nolabel"); lane.appendChild(viz); box.appendChild(lane);
+      const R = makeViz(viz, { nolabel: true, flat: true, noBracket: true });
+      return { steps: ALG[sp.algo](vals), k: 0, R, lane, out: $("b", lane), place: $(".place", lane), fin: false };
+    });
+    draw();
+  }
+  function draw() { lanes.forEach(L => { const s = L.steps[L.k]; L.R.draw(s); L.out.textContent = fmt(s.cmp + s.swp); }); }
+  function tick() {
+    let running = false;
+    lanes.forEach(L => {
+      if (L.fin) return;
+      const startOps = L.steps[L.k].cmp + L.steps[L.k].swp;
+      while (L.k < L.steps.length - 1 && L.steps[L.k].cmp + L.steps[L.k].swp < startOps + 3) L.k++;
+      if (L.k >= L.steps.length - 1) { L.fin = true; finishOrder++; L.place.textContent = `· ${finishOrder} место`; if (finishOrder === 1) L.lane.classList.add("win"); }
+      else running = true;
+    });
+    draw();
+    if (!running) stop();
+  }
+  const btn = $('[data-a="go"]', ctr);
+  function play() { if (lanes.every(L => L.fin)) build(); btn.textContent = "❚❚ Пауза"; timer = setInterval(tick, 45); }
+  function stop() { clearInterval(timer); timer = null; btn.textContent = "▶ Старт"; }
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "go") timer ? stop() : play();
+    if (a === "new") { stop(); build(); }
+  });
+  pauseHooks.push(stop);
+  build();
+  onShow(el, draw);
+  window.addEventListener("resize", () => { if (!el.closest(".slide").hidden) draw(); });
+}
+
+/* ═════════ CODE: highlight + blanks ═════════ */
+const KW = /^(public|private|static|void|int|long|boolean|return|if|else|for|while|new|class|import|true|false|null|break)$/;
+function highlight(src, blanks) {
+  const re = /(\/\/[^\n]*)|("(?:[^"\\\n]|\\.)*")|(\d+)|([A-Za-z_][A-Za-z0-9_]*)|(\d[\d_]*)/g;
+  let out = "", last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index)); last = re.lastIndex;
+    if (m[1]) out += `<span class="c">${esc(m[1])}</span>`;
+    else if (m[2]) out += `<span class="s">${esc(m[2])}</span>`;
+    else if (m[3]) {
+      const v = blanks[+m[3].slice(1, -1)];
+      const w = Math.max(...v.map(s => s.length)) + 2;
+      out += `<input class="blank" type="text" id="blank-${uid++}" data-answer="${esc(v.join("||"))}" style="width:${w}ch" aria-label="Пропуск в коде" autocomplete="off" spellcheck="false">`;
+    } else if (m[4]) out += KW.test(m[4]) ? `<span class="k">${m[4]}</span>` : /^[A-Z]/.test(m[4]) ? `<span class="t">${m[4]}</span>` : m[4];
+    else out += `<span class="n">${m[5]}</span>`;
+  }
+  return out + esc(src.slice(last));
+}
+function initCode(pre) {
+  const blanks = [];
+  const src = pre.textContent.replace(/⟦([^⟧]*)⟧/g, (_, ans) => { blanks.push(ans.split("||")); return "" + (blanks.length - 1) + ""; });
+  pre.innerHTML = highlight(src, blanks);
+  if (!blanks.length) return;
+  const wrap = h("div", "stack"); wrap.style.gap = "0";
+  pre.parentNode.insertBefore(wrap, pre); wrap.appendChild(pre);
+  const row = h("div", "row code-check", `<button class="btn primary" type="button">Проверить код</button><span class="fb" style="margin:0"></span>`);
+  wrap.appendChild(row);
+  const fb = $(".fb", row), inputs = $$("input.blank", pre);
+  const check = () => {
+    let bad = 0;
+    inputs.forEach(inp => {
+      const ok = inp.dataset.answer.split("||").some(v => norm(v) === norm(inp.value));
+      inp.classList.toggle("good", ok); inp.classList.toggle("bad", !ok); if (!ok) bad++;
+    });
+    fb.className = "fb " + (bad ? "bad" : "good");
+    fb.textContent = bad ? `Пока неверно или пусто: ${bad} из ${inputs.length}. Сверься с объяснением рядом.` : "Всё верно! Код рабочий.";
+  };
+  $("button", row).addEventListener("click", check);
+  inputs.forEach(i => i.addEventListener("keydown", e => { if (e.key === "Enter") check(); }));
+}
+
+/* ═════════ QUIZ ═════════ */
+const scores = {};
+function updateScore(g) {
+  const total = $$(`.quiz[data-group="${g}"]`).length, s = scores[g] || 0;
+  const answered = $$(`.quiz[data-group="${g}"]`).filter(q => q.dataset.answered).length;
+  $$(`.score[data-group="${g}"]`).forEach(e => {
+    e.textContent = `${s} / ${total}` + (answered === total ? (s >= 5 ? " — отлично, готовы к практике!" : s >= 3 ? " — неплохо, повтори слайды с ошибками" : " — стоит пролистать теорию ещё раз") : "");
+  });
+}
+function initQuiz(q) {
+  const fb = q.querySelector(":scope > .fb");
+  const g = q.dataset.group;
+  const first = ok => { if (q.dataset.answered) return; q.dataset.answered = "1"; if (g) { if (ok) scores[g] = (scores[g] || 0) + 1; updateScore(g); } };
+  const say = ok => { if (!fb) return; fb.className = "fb " + (ok ? "good" : "bad"); fb.textContent = ok ? fb.dataset.good : fb.dataset.bad; };
+  $$(".opts .opt", q).forEach(o => o.addEventListener("click", () => {
+    const ok = o.hasAttribute("data-ok");
+    o.classList.add(ok ? "ok" : "bad"); first(ok); say(ok);
+  }));
+  const inp = $(".fill input[data-answer]", q);
+  if (inp) {
+    const check = () => {
+      if (!inp.value.trim()) { fb.className = "fb bad"; fb.textContent = "Сначала впиши ответ."; return; }
+      const ok = inp.dataset.answer.split("|").some(v => norm(v) === norm(inp.value));
+      inp.classList.toggle("good", ok); inp.classList.toggle("bad", !ok); first(ok); say(ok);
+    };
+    $(".fill button", q).addEventListener("click", check);
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") check(); });
+  }
+}
+
+/* ═════════ GAMES ═════════ */
+function initCards(el) {
+  const start = el.dataset.arr.split(",").map(Number);
+  let arr, sel, swaps;
+  const wrap = h("div", "cards"), info = h("p", "fb"), row = h("div", "row", `<button class="btn ghost" type="button">Перемешать заново</button>`);
+  row.style.marginTop = "12px";
+  el.append(wrap, info, row);
+  const minSwaps = a => { const s = a.slice().sort((x, y) => x - y), seen = new Array(a.length).fill(false); let c = 0; for (let i = 0; i < a.length; i++) { if (seen[i]) continue; let j = i, len = 0; while (!seen[j]) { seen[j] = true; j = s.indexOf(a[j]); len++; } c += len - 1; } return c; };
+  let best;
+  function reset(shuffle) { arr = shuffle ? uniq(6, 20) : start.slice(); sel = -1; swaps = 0; best = minSwaps(arr); info.className = "fb"; info.textContent = "Обменов: 0"; draw(); }
+  function draw() {
+    const sorted = arr.every((v, i) => i === 0 || arr[i - 1] <= v);
+    wrap.innerHTML = arr.map((v, i) => `<button type="button" class="card${i === sel ? " sel" : ""}${sorted ? " fin" : ""}" data-i="${i}" aria-label="Карточка ${v}">${v}</button>`).join("");
+    if (sorted && swaps > 0) { info.className = "fb good"; info.textContent = `Готово! Ты сделал ${swaps} обм. Меньше всего можно было за ${best}. А если бы чисел был миллион? Руками не выйдет — нужен алгоритм.`; }
+  }
+  wrap.addEventListener("click", e => {
+    const c = e.target.closest(".card"); if (!c) return;
+    const i = +c.dataset.i;
+    if (arr.every((v, k) => k === 0 || arr[k - 1] <= v) && swaps > 0) return;
+    if (sel < 0) sel = i;
+    else if (sel === i) sel = -1;
+    else { [arr[sel], arr[i]] = [arr[i], arr[sel]]; swaps++; sel = -1; info.textContent = `Обменов: ${swaps}`; }
+    draw();
+  });
+  $("button", row).addEventListener("click", () => reset(true));
+  reset(false);
+}
+
+function initMergeGame(el) {
+  let L, Rr, out, cmp;
+  const piles = h("div", "piles"), fb = h("p", "fb"), row = h("div", "row", `<button class="btn ghost" type="button">Новые числа</button>`);
+  el.append(piles, fb, row);
+  function reset() {
+    const v = uniq(8, 60); L = v.slice(0, 4).sort((a, b) => a - b); Rr = v.slice(4).sort((a, b) => a - b); out = []; cmp = 0;
+    fb.className = "fb"; fb.textContent = "Какая из двух верхних карт меньше?"; draw();
+  }
+  const pile = (arr, name) => arr.map((x, i) => `<button type="button" class="card small${i === 0 ? " head" : ""}" data-p="${name}" ${i ? "disabled" : ""}>${x}</button>`).join("");
+  function draw() {
+    piles.innerHTML = `<span class="lbl">Левая</span><div class="cards">${pile(L, "L") || "<span class='hand'>пусто</span>"}</div>
+      <span class="lbl">Правая</span><div class="cards">${pile(Rr, "R") || "<span class='hand'>пусто</span>"}</div>
+      <span class="lbl">Результат</span><div class="cards">${out.map(x => `<span class="card small fin">${x}</span>`).join("") || "<span class='hand'>пока пусто</span>"}</div>`;
+  }
+  piles.addEventListener("click", e => {
+    const c = e.target.closest(".card.head"); if (!c) return;
+    const mine = c.dataset.p === "L" ? L : Rr, other = c.dataset.p === "L" ? Rr : L;
+    if (other.length && mine[0] > other[0]) {
+      c.classList.remove("shake"); void c.offsetWidth; c.classList.add("shake");
+      fb.className = "fb bad"; fb.textContent = `${mine[0]} больше, чем ${other[0]}. Бери меньшую из двух.`; return;
+    }
+    if (other.length) cmp++;
+    out.push(mine.shift()); draw();
+    if (!L.length && !Rr.length) { fb.className = "fb good"; fb.textContent = `Слито 8 чисел, сравнений: ${cmp}. Больше n сравнений не бывает — поэтому слияние стоит O(n).`; }
+    else if (!L.length || !Rr.length) { fb.className = "fb good"; fb.textContent = "Одна стопка кончилась. Остаток второй просто перекладываем по порядку — сравнивать больше не с чем."; }
+    else { fb.className = "fb good"; fb.textContent = "Верно! Дальше."; }
+  });
+  $("button", row).addEventListener("click", reset);
+  reset();
+}
+
+function initBasketGame(el) {
+  const start = el.dataset.arr.split(",").map(Number);
+  let arr, pivot, q, less, more;
+  const lineup = h("div", "cards"), baskets = h("div", "baskets"), ctr = h("div", "row"), fb = h("p", "fb");
+  ctr.innerHTML = `<button class="btn primary" type="button" data-a="l">← Меньше pivot</button><button class="btn primary" type="button" data-a="m">Больше pivot →</button><button class="btn ghost" type="button" data-a="new">Другие числа</button>`;
+  ctr.style.marginTop = "12px";
+  el.append(lineup, baskets, ctr, fb);
+  function reset(rnd) {
+    arr = rnd ? uniq(8, 30) : start.slice(); pivot = arr[arr.length - 1]; q = arr.slice(0, -1); less = []; more = [];
+    fb.className = "fb"; fb.textContent = `Pivot = ${pivot}. Первая карточка в очереди выделена рамкой.`; draw();
+  }
+  function draw() {
+    lineup.innerHTML = q.map((v, i) => `<span class="card small${i === 0 ? " head" : ""}">${v}</span>`).join("") + `<span class="card small pivot-card" title="pivot">${pivot}</span>`;
+    const fin = !q.length;
+    baskets.innerHTML = `<div class="basket"><span class="lbl">меньше ${pivot}</span>${less.map(v => `<span class="card small">${v}</span>`).join("")}</div>
+      <div class="basket" style="border-style:solid;border-color:var(--pivot);align-content:center;justify-content:center;min-width:70px"><span class="lbl" style="text-align:center">pivot</span>${fin ? `<span class="card small pivot-card">${pivot}</span>` : ""}</div>
+      <div class="basket"><span class="lbl">больше ${pivot}</span>${more.map(v => `<span class="card small">${v}</span>`).join("")}</div>`;
+    $$('[data-a="l"],[data-a="m"]', ctr).forEach(b => b.disabled = fin);
+  }
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a; if (!a) return;
+    if (a === "new") return reset(true);
+    const v = q[0], ok = a === "l" ? v < pivot : v > pivot;
+    if (!ok) { fb.className = "fb bad"; fb.textContent = `${v} ${v < pivot ? "меньше" : "больше"} ${pivot}. Попробуй другую кнопку.`; const c = $(".head", lineup); c.classList.remove("shake"); void c.offsetWidth; c.classList.add("shake"); return; }
+    (a === "l" ? less : more).push(q.shift());
+    if (!q.length) { fb.className = "fb good"; fb.textContent = `Готово! Pivot ${pivot} встаёт между группами — на позицию ${less.length}. Левую группу [${less.join(", ")}] и правую [${more.join(", ")}] дальше сортируем тем же способом.`; }
+    else { fb.className = "fb good"; fb.textContent = "Верно!"; }
+    draw();
+  });
+  reset(false);
+}
+
+function initTree(el) {
+  const vals = el.dataset.arr.split(",").map(Number);
+  let D = 0;
+  const build = (arr, d) => { D = Math.max(D, d); if (arr.length < 2) return { arr, d, kids: null }; const m = Math.ceil(arr.length / 2); return { arr, d, kids: [build(arr.slice(0, m), d + 1), build(arr.slice(m), d + 1)] }; };
+  const root = build(vals, 0);
+  const at = (node, t) => (!node.kids || node.d === t) ? [node] : node.kids.flatMap(k => at(k, t));
+  const rows = [];
+  for (let t = 0; t <= D; t++) rows.push({ tag: t === 0 ? "массив" : "делим", merge: false, groups: at(root, t).map(n => n.arr) });
+  if (el.dataset.only !== "split") for (let t = D - 1; t >= 0; t--) rows.push({ tag: "сливаем", merge: true, groups: at(root, t).map(n => n.arr.slice().sort((a, b) => a - b)) });
+  const tree = h("div", "tree");
+  tree.innerHTML = rows.map(r => `<div class="trow${r.merge ? " merge" : ""}"><span class="tag">${r.tag}</span>${r.groups.map(g => `<span class="grp">${g.map(v => `<span>${v}</span>`).join("")}</span>`).join("")}</div>`).join("");
+  const ctr = h("div", "row", `<button class="btn primary" type="button" data-a="next">Дальше ↓</button><button class="btn ghost" type="button" data-a="all">Показать всё</button><button class="btn ghost" type="button" data-a="reset">Сначала</button>`);
+  el.append(tree, ctr);
+  const rowEls = $$(".trow", tree);
+  let shown = 1;
+  const draw = () => { rowEls.forEach((r, i) => r.classList.toggle("off", i >= shown)); $('[data-a="next"]', ctr).disabled = shown >= rowEls.length; };
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "next") shown = Math.min(rowEls.length, shown + 1);
+    if (a === "all") shown = rowEls.length;
+    if (a === "reset") shown = 1;
+    draw();
+  });
+  draw();
+}
+
+function initTri(el) {
+  const n = +el.dataset.n; let total = 0, html = "";
+  for (let p = 1; p < n; p++) { const c = n - p; total += c; html += `<div class="r">${"<i></i>".repeat(c)}<span>проход ${p}: ${c}</span></div>`; }
+  el.innerHTML = html + `<p style="margin:6px 0 0"><b>Всего: ${total} сравнений</b> = ${n}·${n - 1}/2</p>`;
+}
+
+function initGuess(el) {
+  let secret, lo, hi, tries, won;
+  const gid = "guess-" + (uid++);
+  el.innerHTML = `<p class="q" id="${gid}-range"></p>
+    <div class="strip" style="display:flex;gap:1px;height:26px;margin-bottom:12px"></div>
+    <div class="fill"><label for="${gid}">Твой вариант:</label><input type="text" inputmode="numeric" id="${gid}" style="width:7ch">
+    <button class="btn primary" type="button" data-a="go">Проверить</button><button class="btn ghost" type="button" data-a="mid">Подсказать середину</button><button class="btn ghost" type="button" data-a="new">Новое число</button></div>
+    <p class="fb"></p><div class="cards hist" style="gap:6px"></div>`;
+  const inp = $("input", el), fb = $(".fb", el), strip = $(".strip", el), hist = $(".hist", el), rng = $(`#${gid}-range`, el);
+  strip.innerHTML = Array.from({ length: 100 }, () => `<i style="flex:1;border-radius:2px;background:var(--pen);transition:opacity .3s"></i>`).join("");
+  const cellsEls = $$("i", strip);
+  function reset() { secret = 1 + ((Math.random() * 100) | 0); lo = 1; hi = 100; tries = 0; won = false; hist.innerHTML = ""; fb.className = "fb"; fb.textContent = ""; inp.value = ""; draw(); }
+  function draw() {
+    rng.textContent = won ? `Загаданное число: ${secret}` : `Число где-то между ${lo} и ${hi}. Попыток: ${tries}`;
+    cellsEls.forEach((c, i) => { const v = i + 1; c.style.opacity = won ? (v === secret ? 1 : .12) : (v >= lo && v <= hi ? 1 : .12); });
+  }
+  function go() {
+    if (won) return;
+    const g = parseInt(inp.value, 10);
+    if (Number.isNaN(g) || g < 1 || g > 100) { fb.className = "fb bad"; fb.textContent = "Впиши целое число от 1 до 100."; return; }
+    tries++;
+    let msg;
+    if (g === secret) { won = true; msg = "угадал"; fb.className = "fb good"; fb.textContent = tries <= 7 ? `Угадал за ${tries}! Называя середину, ты делал бинарный поиск.` : `Угадал за ${tries}. Попробуй ещё раз, называя середину, — хватит 7 попыток.`; }
+    else if (g < secret) { lo = Math.max(lo, g + 1); msg = "больше"; fb.className = "fb"; fb.textContent = `Загаданное число БОЛЬШЕ ${g}.`; }
+    else { hi = Math.min(hi, g - 1); msg = "меньше"; fb.className = "fb"; fb.textContent = `Загаданное число МЕНЬШЕ ${g}.`; }
+    hist.insertAdjacentHTML("beforeend", `<span class="chip">${g} → ${msg}</span>`);
+    inp.value = ""; draw();
+  }
+  el.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "go") go();
+    if (a === "mid" && !won) { inp.value = Math.floor((lo + hi) / 2); inp.focus(); }
+    if (a === "new") reset();
+  });
+  inp.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  reset();
+}
+
+function initDecide(el) {
+  const T = {
+    q1: { q: "Это рабочая программа, а не учебное задание?", yes: "r1", no: "q2" },
+    q2: { q: "Элементов мало (до ~50) или массив почти отсортирован?", yes: "r2", no: "q3" },
+    q3: { q: "Значения — небольшие целые числа из узкого диапазона (оценки, возраст)?", yes: "r3", no: "q4" },
+    q4: { q: "Нужно сохранить порядок равных элементов или гарантировать скорость даже в худшем случае?", yes: "r4", no: "r5" },
+    r1: { t: "Arrays.sort() или Collections.sort()", d: "Готовые, быстрые и проверенные. Свои сортировки пишем, чтобы понять, как всё устроено." },
+    r2: { t: "Вставками", d: "На маленьких и почти упорядоченных данных работает почти за O(n) и пишется в пять строк." },
+    r3: { t: "Подсчётом", d: "O(n + k): считаем, сколько раз встретилось каждое значение, и выписываем по порядку." },
+    r4: { t: "Слиянием", d: "Всегда O(n log n) и стабильная. Цена — дополнительная память O(n)." },
+    r5: { t: "Быстрая", d: "В среднем самая быстрая на практике, лишней памяти почти не нужно. Pivot бери из середины или случайный." }
+  };
+  let cur = "q1", path = [];
+  function draw() {
+    const node = T[cur];
+    const trail = path.map(p => `<li>${T[p.id].q} — <b>${p.ans}</b></li>`).join("");
+    el.innerHTML = `<h3>Помощник выбора</h3>${trail ? `<ol style="margin:0 0 10px;padding-left:20px;font-size:.85rem;color:var(--ink-2)">${trail}</ol>` : ""}` +
+      (node.q ? `<div class="step"><p class="q" style="margin:0">${node.q}</p><div class="row"><button class="btn primary" type="button" data-a="yes">Да</button><button class="btn" type="button" data-a="no">Нет</button></div></div>`
+              : `<div class="verdict"><h3>Бери: ${node.t}</h3><p style="margin:0">${node.d}</p></div><div class="row" style="margin-top:10px"><button class="btn ghost" type="button" data-a="again">Начать заново</button></div>`);
+  }
+  el.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a; if (!a) return;
+    if (a === "again") { cur = "q1"; path = []; }
+    else { path.push({ id: cur, ans: a === "yes" ? "да" : "нет" }); cur = T[cur][a]; }
+    draw();
+  });
+  draw();
+}
+
+function initCallTree(el) {
+  const a = el.dataset.arr.split(",").map(Number), lines = [];
+  (function ms(l, r, d) {
+    const part = `[${a.slice(l, r + 1).join(", ")}]`;
+    if (l >= r) { lines.push({ d, t: `mergeSort(${l}, ${r}) ${part} — один элемент, выходим` }); return; }
+    const m = (l + r) >> 1;
+    lines.push({ d, t: `mergeSort(${l}, ${r}) ${part} → mid = ${m}` });
+    ms(l, m, d + 1); ms(m + 1, r, d + 1);
+    const merged = a.slice(l, r + 1).sort((x, y) => x - y);
+    for (let k = l; k <= r; k++) a[k] = merged[k - l];
+    lines.push({ d, t: `merge(${l}, ${m}, ${r}) → [${merged.join(", ")}]`, merge: true });
+  })(0, a.length - 1, 0);
+  el.innerHTML = `<h3>Порядок вызовов для [${el.dataset.arr.split(",").join(", ")}]</h3><ol class="calls" style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px;font-family:var(--f-mono);font-size:.8rem;overflow-x:auto"></ol>
+    <div class="row" style="margin-top:10px"><button class="btn primary" type="button" data-a="next">Следующий вызов</button><button class="btn ghost" type="button" data-a="all">Показать всё</button><button class="btn ghost" type="button" data-a="reset">Сначала</button></div>`;
+  const ol = $(".calls", el);
+  ol.innerHTML = lines.map(L => `<li style="padding:3px 8px;margin-left:${L.d * 22}px;border-left:3px solid ${L.merge ? "var(--done)" : "var(--pen)"};background:var(--paper);white-space:nowrap">${esc(L.t)}</li>`).join("");
+  const lis = $$("li", ol);
+  let shown = 1;
+  const draw = () => { lis.forEach((li, i) => li.hidden = i >= shown); $('[data-a="next"]', el).disabled = shown >= lis.length; };
+  el.addEventListener("click", e => {
+    const act = e.target.closest("button")?.dataset.a;
+    if (act === "next") shown++;
+    if (act === "all") shown = lis.length;
+    if (act === "reset") shown = 1;
+    draw();
+  });
+  draw();
+}
+
+function initLomuto(el) {
+  const start = el.dataset.arr.split(",").map(Number);
+  let a, i, j, high, finished, log;
+  el.innerHTML = `<div class="cards lm-cells" style="gap:8px"></div><div class="cards lm-ptr" style="gap:8px;margin-top:2px"></div>
+    <p class="q lm-q" style="margin-top:14px"></p><div class="row lm-btns"></div><p class="fb"></p>
+    <ol class="lm-log" style="margin:8px 0 0;padding-left:20px;font-family:var(--f-mono);font-size:.8rem;color:var(--ink-2)"></ol>
+    <div class="row" style="margin-top:10px"><button class="btn ghost" type="button" data-a="reset">Начать заново</button></div>`;
+  const cellsEl = $(".lm-cells", el), ptrEl = $(".lm-ptr", el), qEl = $(".lm-q", el), btns = $(".lm-btns", el), fb = $(".fb", el), logEl = $(".lm-log", el);
+  function reset() { a = start.slice(); high = a.length - 1; i = -1; j = 0; finished = false; logEl.innerHTML = ""; fb.className = "fb"; fb.textContent = ""; draw(); }
+  function draw() {
+    const p = a[high];
+    cellsEl.innerHTML = a.map((v, k) => {
+      let st = "";
+      if (finished && k === i + 1) st = "background:var(--done);border-color:var(--done)";
+      else if (k === high && !finished) st = "background:color-mix(in srgb,var(--pivot) 22%,var(--surface));border-color:var(--pivot)";
+      else if (k <= i) st = "background:var(--less)";
+      if (k === j && !finished && j < high) st += ";box-shadow:0 0 0 3px var(--cmp)";
+      return `<span class="card small" style="${st}">${v}</span>`;
+    }).join("");
+    ptrEl.innerHTML = a.map((_, k) => {
+      const t = [k === i ? "i" : "", k === j && !finished && j < high ? "j" : "", k === high ? "pivot" : ""].filter(Boolean).join(" ");
+      return `<span style="width:46px;text-align:center;font-family:var(--f-mono);font-size:.72rem;font-weight:700;color:var(--pen)">${t}</span>`;
+    }).join("");
+    if (finished) { qEl.textContent = "partition закончен."; btns.innerHTML = ""; return; }
+    if (j < high) {
+      qEl.innerHTML = `i = ${i}, j = ${j}. Сравниваем a[j] = <b>${a[j]}</b> с pivot = <b>${p}</b>. Что делаем?`;
+      btns.innerHTML = `<button class="btn primary" type="button" data-c="take">${a[j]} &lt; ${p}: i++ и swap(a, i, j)</button><button class="btn" type="button" data-c="skip">${a[j]} ≥ ${p}: пропускаем, j++</button>`;
+    } else {
+      qEl.innerHTML = `Цикл по j закончился (i = ${i}). Последний шаг?`;
+      btns.innerHTML = `<button class="btn" type="button" data-c="endA">swap(a, i, high); return i;</button><button class="btn" type="button" data-c="endB">swap(a, i + 1, high); return i + 1;</button><button class="btn" type="button" data-c="endC">return high;</button>`;
+    }
+  }
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.a === "reset") return reset();
+    const c = b.dataset.c; if (!c) return;
+    const p = a[high];
+    if (c === "take" || c === "skip") {
+      const right = a[j] < p ? "take" : "skip";
+      if (c !== right) { fb.className = "fb bad"; fb.textContent = right === "take" ? `${a[j]} меньше ${p} — его нужно отправить в зону «меньше».` : `${a[j]} не меньше ${p} — оно остаётся справа, ничего не меняем.`; return; }
+      if (c === "take") { i++; const before = `${a[i]}⇄${a[j]}`; [a[i], a[j]] = [a[j], a[i]]; logEl.insertAdjacentHTML("beforeend", `<li>j=${j}: ${a[i]} &lt; ${p} → i=${i}, swap ${before} → [${a.join(", ")}]</li>`); }
+      else logEl.insertAdjacentHTML("beforeend", `<li>j=${j}: ${a[j]} ≥ ${p} → пропуск</li>`);
+      j++; fb.className = "fb good"; fb.textContent = "Верно!";
+    } else {
+      if (c !== "endB") { fb.className = "fb bad"; fb.textContent = "Нет: зона «меньше» — это индексы до i включительно. pivot должен встать сразу за ней."; return; }
+      [a[i + 1], a[high]] = [a[high], a[i + 1]];
+      finished = true;
+      logEl.insertAdjacentHTML("beforeend", `<li>swap(${i + 1}, ${high}) → [${a.join(", ")}], return ${i + 1}</li>`);
+      fb.className = "fb good"; fb.textContent = `Отлично! partition вернул ${i + 1}. Слева [${a.slice(0, i + 1).join(", ")}] — все меньше ${p}, справа [${a.slice(i + 2).join(", ")}] — все больше.`;
+    }
+    draw();
+  });
+  reset();
+}
+
+function initParsons(el) {
+  const text = $("script", el).textContent;
+  const sols = text.split(/\n---\n/).map(s => s.replace(/^\n+|\s+$/g, "").split("\n"));
+  const lines = sols[0];
+  el.innerHTML = `<div class="plist pool"><h4>Строки</h4></div><div class="plist ans"><h4>Твой метод</h4></div>
+    <div class="row" style="grid-column:1/-1"><button class="btn primary" type="button" data-a="check">Проверить</button><button class="btn ghost" type="button" data-a="reset">Сбросить</button><span class="fb" style="margin:0"></span></div>`;
+  const pool = $(".pool", el), ans = $(".ans", el), fb = $(".fb", el);
+  let order, picked;
+  function reset() {
+    do { order = uniq(lines.length, lines.length).map(x => x - 1); } while (order.every((v, i) => v === i));
+    picked = []; fb.className = "fb"; fb.textContent = ""; draw();
+  }
+  function draw(marks = {}) {
+    pool.innerHTML = "<h4>Строки</h4>" + order.filter(k => !picked.includes(k)).map(k => `<button type="button" class="pline" data-k="${k}">${esc(lines[k])}</button>`).join("");
+    ans.innerHTML = "<h4>Твой метод</h4>" + (picked.map((k, i) => `<button type="button" class="pline ${marks[i] || ""}" data-k="${k}" data-in="1">${esc(lines[k])}</button>`).join("") || `<span class="hand" style="font-size:1.2rem">кликай строки слева по порядку</span>`);
+  }
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.a === "reset") return reset();
+    if (b.dataset.a === "check") {
+      if (picked.length < lines.length) { fb.className = "fb bad"; fb.textContent = `Перенеси все строки — осталось ${lines.length - picked.length}.`; return; }
+      const got = picked.map(k => lines[k]);
+      if (sols.some(s => s.length === got.length && s.every((x, i) => x === got[i]))) { fb.className = "fb good"; fb.textContent = "Всё верно! Метод собран правильно."; draw(Object.fromEntries(got.map((_, i) => [i, "good"]))); return; }
+      let bestPrefix = 0;
+      sols.forEach(s => { let p = 0; while (p < got.length && s[p] === got[p]) p++; bestPrefix = Math.max(bestPrefix, p); });
+      const marks = {}; for (let i = 0; i < bestPrefix; i++) marks[i] = "good"; marks[bestPrefix] = "bad";
+      fb.className = "fb bad"; fb.textContent = `Строка №${bestPrefix + 1} стоит не на своём месте. Всё, что выше, — верно. Кликни строку, чтобы вернуть её.`;
+      draw(marks); return;
+    }
+    const k = +b.dataset.k; if (Number.isNaN(k)) return;
+    if (b.dataset.in) picked = picked.filter(x => x !== k); else picked.push(k);
+    fb.textContent = ""; draw();
+  });
+  reset();
+}
+
+function initChecklist(el) {
+  const boxes = $$("input[type=checkbox]", el), msg = $("#checkMsg");
+  const upd = () => {
+    const c = boxes.filter(b => b.checked).length;
+    msg.className = "fb" + (c === boxes.length ? " good" : "");
+    msg.textContent = c === boxes.length ? "Все тесты пройдены — можно сдавать КТ2!" : `Пройдено ${c} из ${boxes.length}`;
+  };
+  boxes.forEach(b => { if (store.get("kt2-" + b.id) === "1") b.checked = true; b.addEventListener("change", () => { store.set("kt2-" + b.id, b.checked ? "1" : "0"); upd(); }); });
+  upd();
+}
+
+/* ═════════ BIG-O CHART ═════════ */
+const SERIES = [
+  { label: "O(1)", f: n => 1, c: "--s1", d: "2 5", dp: 0 },
+  { label: "O(log n)", f: n => Math.log2(n), c: "--s2", d: "10 6", dp: 1 },
+  { label: "O(n)", f: n => n, c: "--s3", d: "", dp: 0 },
+  { label: "O(n log n)", f: n => n * Math.log2(n), c: "--s4", d: "14 5 3 5", dp: 0 },
+  { label: "O(n²)", f: n => n * n, c: "--s5", d: "", dp: 0 },
+  { label: "O(2ⁿ)", f: n => 2 ** n, c: "--s6", d: "3 3", dp: 0 }
+];
+function initChart(el) {
+  const W = 640, H = 380, m = { l: 50, r: 16, t: 14, b: 46 }, X1 = 24, Y1 = 120;
+  const pw = W - m.l - m.r, ph = H - m.t - m.b;
+  const sx = n => m.l + (n / X1) * pw, sy = v => m.t + ph - (v / Y1) * ph;
+  let g = "";
+  for (let v = 0; v <= Y1; v += 20) g += `<line x1="${m.l}" x2="${W - m.r}" y1="${sy(v)}" y2="${sy(v)}" style="stroke:var(--line)" stroke-width="${v ? 1 : 1.5}" fill="none"/><text x="${m.l - 8}" y="${sy(v) + 4}" text-anchor="end">${v}</text>`;
+  for (let n = 0; n <= X1; n += 4) g += `<text x="${sx(n)}" y="${H - m.b + 18}" text-anchor="middle">${n}</text>`;
+  g += `<text x="${m.l + pw / 2}" y="${H - 6}" text-anchor="middle">n — сколько элементов</text><text x="${m.l}" y="${m.t - 2}" text-anchor="start" dx="4" dy="10">шагов</text>`;
+  const paths = SERIES.map((s, i) => {
+    let d = "";
+    for (let n = 1; n <= X1 + 1e-9; n += 0.1) { const v = s.f(n); d += (d ? "L" : "M") + sx(n).toFixed(1) + " " + sy(Math.min(v, Y1 * 4)).toFixed(1); if (v > Y1 * 4) break; }
+    return `<path data-s="${i}" d="${d}" fill="none" style="stroke:var(${s.c})" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" ${s.d ? `stroke-dasharray="${s.d}"` : ""} clip-path="url(#plotclip)"/>`;
+  }).join("");
+  const dots = SERIES.map((s, i) => `<circle data-dot="${i}" r="5" style="fill:var(${s.c});stroke:var(--paper)" stroke-width="2" visibility="hidden"/>`).join("");
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Графики роста O(1), O(log n), O(n), O(n log n), O(n²) и O(2ⁿ) для n от 1 до 24">
+    <defs><clipPath id="plotclip"><rect x="${m.l}" y="${m.t}" width="${pw}" height="${ph}"/></clipPath></defs>
+    ${g}${paths}<line class="hx" y1="${m.t}" y2="${m.t + ph}" style="stroke:var(--ink-2)" stroke-width="1" stroke-dasharray="3 3" visibility="hidden"/>${dots}
+    <rect class="hit" x="${m.l}" y="${m.t}" width="${pw}" height="${ph}" fill="transparent" tabindex="0" aria-label="Область графика: стрелками меняй n"/></svg>
+    <div class="tip" hidden></div>
+    <div class="lgd">${SERIES.map((s, i) => `<button type="button" aria-pressed="true" data-t="${i}"><svg viewBox="0 0 22 8"><line x1="1" x2="21" y1="4" y2="4" style="stroke:var(${s.c})" stroke-width="3" ${s.d ? `stroke-dasharray="${s.d.split(" ").map(x => x / 2).join(" ")}"` : ""}/></svg>${s.label}</button>`).join("")}</div>`;
+  const svg = $("svg", el), tip = $(".tip", el), hx = $(".hx", svg), hit = $(".hit", svg);
+  const vis = SERIES.map(() => true);
+  let curN = 8;
+  const val = (s, n) => { const v = s.f(n); return s.dp ? v.toFixed(1).replace(".", ",") : fmt(v); };
+  function show(n) {
+    curN = n;
+    hx.setAttribute("x1", sx(n)); hx.setAttribute("x2", sx(n)); hx.setAttribute("visibility", "visible");
+    SERIES.forEach((s, i) => { const c = $(`[data-dot="${i}"]`, svg), v = s.f(n); c.setAttribute("cx", sx(n)); c.setAttribute("cy", sy(v)); c.setAttribute("visibility", vis[i] && v <= Y1 ? "visible" : "hidden"); });
+    tip.innerHTML = `<b>n = ${n}</b>` + SERIES.map((s, i) => vis[i] ? `<div><span><i style="background:var(${s.c})"></i>${s.label}</span><b>${val(s, n)}</b></div>` : "").reverse().join("");
+    tip.hidden = false;
+    const scale = svg.getBoundingClientRect().width / W, px = sx(n) * scale;
+    tip.style.top = "8px";
+    tip.style.left = (px + 180 > el.clientWidth ? px - 172 : px + 14) + "px";
+  }
+  const hide = () => { tip.hidden = true; hx.setAttribute("visibility", "hidden"); $$("[data-dot]", svg).forEach(c => c.setAttribute("visibility", "hidden")); };
+  const fromEvent = e => { const r = svg.getBoundingClientRect(); const x = (e.clientX - r.left) * (W / r.width); return Math.min(X1, Math.max(1, Math.round((x - m.l) / pw * X1))); };
+  hit.addEventListener("pointermove", e => show(fromEvent(e)));
+  hit.addEventListener("pointerdown", e => show(fromEvent(e)));
+  hit.addEventListener("pointerleave", hide);
+  hit.addEventListener("focus", () => show(curN));
+  hit.addEventListener("blur", hide);
+  hit.addEventListener("keydown", e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { e.preventDefault(); e.stopPropagation(); show(Math.min(X1, Math.max(1, curN + (e.key === "ArrowRight" ? 1 : -1)))); } });
+  $(".lgd", el).addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const i = +b.dataset.t; vis[i] = !vis[i]; b.setAttribute("aria-pressed", vis[i]);
+    $(`path[data-s="${i}"]`, svg).style.display = vis[i] ? "" : "none";
+    if (!tip.hidden) show(curN);
+  });
+}
+
+function initCalc(el) {
+  const NS = [10, 100, 1000, 10000, 100000, 1000000];
+  let n = 1000;
+  el.innerHTML = `<div class="row" role="group" aria-label="Размер данных n" style="margin-bottom:12px"></div><div class="tbl-wrap"><table><thead><tr><th>Сложность</th><th class="num">Шагов</th><th class="num">Время</th><th>Итог</th></tr></thead><tbody></tbody></table></div>`;
+  const row = $(".row", el), tb = $("tbody", el);
+  const sup = k => String(k).split("").map(c => "⁰¹²³⁴⁵⁶⁷⁸⁹"[+c]).join("");
+  const time = s => {
+    if (s < 1e-3) return "меньше 1 мс";
+    if (s < 1) return fmt(s * 1000) + " мс";
+    if (s < 60) return s.toFixed(1).replace(".", ",") + " с";
+    if (s < 3600) return fmt(s / 60) + " мин";
+    if (s < 86400) return (s / 3600).toFixed(1).replace(".", ",") + " ч";
+    if (s < 3.15e7) return fmt(s / 86400) + " дн.";
+    if (s < 4.35e17) { const y = s / 3.15e7; return y < 1e6 ? fmt(y) + " лет" : "≈ 10" + sup(Math.floor(Math.log10(y))) + " лет"; }
+    return "дольше возраста Вселенной";
+  };
+  function draw() {
+    row.innerHTML = NS.map(v => `<button type="button" class="btn${v === n ? " primary" : ""}" aria-pressed="${v === n}" data-n="${v}">n = ${fmt(v)}</button>`).join("");
+    tb.innerHTML = SERIES.map(s => {
+      let steps, secs;
+      if (s.label === "O(2ⁿ)") { const lg = n * Math.log10(2); steps = lg < 15 ? fmt(2 ** n) : "≈ 10" + sup(Math.floor(lg)); secs = lg > 300 ? Infinity : 2 ** n / 1e8; }
+      else { const v = s.f(n); steps = s.dp && v < 100 ? v.toFixed(1).replace(".", ",") : fmt(v); secs = v / 1e8; }
+      const tag = secs < 1 ? `<span class="tag-good">успеем</span>` : secs < 60 ? `<span class="tag-mid">подождём</span>` : `<span class="tag-bad">не дождёмся</span>`;
+      return `<tr><td class="o"><i style="display:inline-block;width:14px;height:3px;border-radius:2px;background:var(${s.c});vertical-align:middle;margin-right:8px"></i>${s.label}</td><td class="num">${steps}</td><td class="num">${secs === Infinity ? "дольше возраста Вселенной" : time(secs)}</td><td>${tag}</td></tr>`;
+    }).join("");
+  }
+  row.addEventListener("click", e => { const b = e.target.closest("button"); if (b) { n = +b.dataset.n; draw(); } });
+  draw();
+}
+
+/* ═════════ INIT ALL ═════════ */
+$$("pre.code").forEach(initCode);
+$$(".quiz").forEach(initQuiz);
+$$(".player").forEach(initPlayer);
+$$(".race").forEach(initRace);
+$$(".cards-game").forEach(initCards);
+$$(".merge-game").forEach(initMergeGame);
+$$(".basket-game").forEach(initBasketGame);
+$$(".tree-viz").forEach(initTree);
+$$(".tri").forEach(initTri);
+$$(".guess-game").forEach(initGuess);
+$$(".decide").forEach(initDecide);
+$$(".calltree").forEach(initCallTree);
+$$(".lomuto-game").forEach(initLomuto);
+$$(".parsons").forEach(initParsons);
+$$(".checklist").forEach(initChecklist);
+$$(".bigo-chart").forEach(initChart);
+$$(".bigo-calc").forEach(initCalc);
+$$(".sortdemo").forEach(initSortDemo);
+$$(".compare-demo").forEach(initCompare);
+$$(".swap-demo").forEach(initSwap);
+$$(".bubble-hand").forEach(initBubbleHand);
+$$(".mergesort-hand").forEach(initMSHand);
+$$(".quick-tree").forEach(initQuickTree);
+$$(".nest-demo").forEach(initNest);
+$$(".queue-demo").forEach(initQueue);
+$$(".callstack").forEach(initCallStack);
+$$(".fib-tree").forEach(initFibTree);
+$$(".hanoi").forEach(initHanoi);
+$$(".stack-demo").forEach(initStackDemo);
+$$(".list-demo").forEach(initListDemo);
+$$(".graph-demo").forEach(initGraphDemo);
+$$(".graph-matrix").forEach(initGraphMatrix);
+$$(".matrix-quiz").forEach(initMatrixQuiz);
+$$(".graph-list").forEach(initGraphList);
+$$(".list-quiz").forEach(initListQuiz);
+
+/* ═════════ ВИДЖЕТЫ ПРО ГРАФЫ ═════════ */
+function parseG(el) {
+  const v = (el.dataset.v || "A,B,C").split(",");
+  const e = (el.dataset.e || "").split(",").filter(Boolean).map(s => s.split("-"));
+  const idx = Object.fromEntries(v.map((x, i) => [x, i]));
+  const directed = !!el.dataset.directed;
+  const adj = v.map(() => []);
+  e.forEach(([a, b]) => { adj[idx[a]].push(idx[b]); if (!directed) adj[idx[b]].push(idx[a]); });
+  const pos = v.map((_, i) => {
+    const ang = -Math.PI / 2 + i * 2 * Math.PI / v.length;
+    return [200 + 140 * Math.cos(ang), 150 + 105 * Math.sin(ang)];
+  });
+  return { v, e, idx, adj, pos, directed, uid: uid++ };
+}
+function gsvg(G, hl = {}) {
+  const marker = G.directed ? `<defs><marker id="ar${G.uid}" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill:var(--ink-2)"/></marker></defs>` : "";
+  const edges = G.e.map(([a, b]) => {
+    const p = G.pos[G.idx[a]], q = G.pos[G.idx[b]];
+    const dx = q[0] - p[0], dy = q[1] - p[1], len = Math.hypot(dx, dy) || 1, r = 24;
+    const on = (hl.edges || []).includes(a + "-" + b) || (hl.edges || []).includes(b + "-" + a);
+    return `<line class="ge${on ? " on" : ""}" data-e="${a}-${b}" x1="${(p[0] + dx / len * r).toFixed(1)}" y1="${(p[1] + dy / len * r).toFixed(1)}" x2="${(q[0] - dx / len * r).toFixed(1)}" y2="${(q[1] - dy / len * r).toFixed(1)}"${G.directed ? ` marker-end="url(#ar${G.uid})"` : ""}/>`;
+  }).join("");
+  const nodes = G.v.map((name, i) => {
+    const [x, y] = G.pos[i];
+    const cls = hl.active === name ? "gn act" : (hl.sel || []).includes(name) ? "gn sel" : (hl.nodes || []).includes(name) ? "gn nb" : "gn";
+    return `<g class="${cls}" data-v="${name}"><circle cx="${x}" cy="${y}" r="22"/><text x="${x}" y="${y + 5}" text-anchor="middle">${name}</text></g>`;
+  }).join("");
+  return `<svg viewBox="0 0 400 300" role="img" aria-label="Граф из ${G.v.length} вершин">${marker}${edges}${nodes}</svg>`;
+}
+function matOf(G) {
+  const n = G.v.length, m = G.v.map(() => new Array(n).fill(0));
+  G.e.forEach(([a, b]) => { m[G.idx[a]][G.idx[b]] = 1; if (!G.directed) m[G.idx[b]][G.idx[a]] = 1; });
+  return m;
+}
+function matTable(G, m, o = {}) {
+  const n = G.v.length;
+  let html = `<table class="gmat"><thead><tr><th></th>${G.v.map(x => `<th>${x}</th>`).join("")}</tr></thead><tbody>`;
+  for (let i = 0; i < n; i++) {
+    html += `<tr><th>${G.v[i]}</th>` + G.v.map((_, j) =>
+      `<td class="${i === j ? "diag" : ""}${m[i][j] ? " one" : ""}${o.click && i !== j ? " click" : ""}${o.err && o.err[i][j] ? " err" : ""}" data-i="${i}" data-j="${j}">${m[i][j]}</td>`).join("") + `</tr>`;
+  }
+  return html + "</tbody></table>";
+}
+
+function initGraphDemo(el) {
+  const G = parseG(el);
+  el.classList.add("gwrap");
+  if (el.dataset.small) el.classList.add("small");
+  const box = h("div"), note = h("p", "pnote");
+  note.setAttribute("aria-live", "polite");
+  el.append(box, note);
+  let act = null;
+  function draw() {
+    const nb = act ? G.adj[G.idx[act]].map(i => G.v[i]) : [];
+    box.innerHTML = gsvg(G, act ? { active: act, nodes: nb, edges: G.e.filter(([a, b]) => a === act || b === act).map(([a, b]) => a + "-" + b) } : {});
+    note.textContent = act ? `Соседи ${act}: ${nb.join(", ") || "нет"} · степень ${nb.length}` : "Кликни по любой вершине — увидишь её соседей.";
+  }
+  box.addEventListener("click", e => {
+    const g = e.target.closest("[data-v]"); if (!g) return;
+    act = act === g.dataset.v ? null : g.dataset.v;
+    draw();
+  });
+  draw();
+}
+
+function initGraphMatrix(el) {
+  const G = parseG(el), m = matOf(G);
+  el.classList.add("gwrap");
+  const row = h("div", "gm-row"), gbox = h("div"), tbox = h("div");
+  const note = h("p", "pnote");
+  row.append(gbox, tbox); el.append(row, note);
+  let hot = null;
+  function draw() {
+    gbox.innerHTML = gsvg(G, hot ? { edges: [G.v[hot[0]] + "-" + G.v[hot[1]]], nodes: [G.v[hot[0]], G.v[hot[1]]] } : {});
+    tbox.innerHTML = matTable(G, m);
+    if (hot) { const td = tbox.querySelector(`td[data-i="${hot[0]}"][data-j="${hot[1]}"]`); if (td) td.classList.add("hot"); }
+    note.textContent = hot
+      ? (m[hot[0]][hot[1]] ? `m[${G.v[hot[0]]}][${G.v[hot[1]]}] = 1 — ребро есть` : `m[${G.v[hot[0]]}][${G.v[hot[1]]}] = 0 — прямого ребра нет`)
+      : "Наведи курсор на ячейку матрицы.";
+  }
+  tbox.addEventListener("mouseover", e => {
+    const td = e.target.closest("td"); if (!td) return;
+    const i = +td.dataset.i, j = +td.dataset.j;
+    if (i === j) return;
+    hot = [i, j]; draw();
+  });
+  tbox.addEventListener("mouseleave", () => { hot = null; draw(); });
+  draw();
+}
+
+function initMatrixQuiz(el) {
+  const G = parseG(el), truth = matOf(G), n = G.v.length;
+  el.classList.add("gwrap");
+  let m = G.v.map(() => new Array(n).fill(0)), err = null;
+  const row = h("div", "gm-row"), gbox = h("div"), tbox = h("div");
+  const ctr = h("div", "row", `<button class="btn primary" type="button" data-a="check">Проверить</button><button class="btn ghost" type="button" data-a="reset">Сбросить</button>`);
+  const fb = h("p", "fb");
+  row.append(gbox, tbox); el.append(row, ctr, fb);
+  function draw() {
+    gbox.innerHTML = gsvg(G);
+    tbox.innerHTML = matTable(G, m, { click: true, err });
+  }
+  tbox.addEventListener("click", e => {
+    const td = e.target.closest("td.click"); if (!td) return;
+    const i = +td.dataset.i, j = +td.dataset.j;
+    const nv = m[i][j] ? 0 : 1;
+    m[i][j] = nv; if (!G.directed) m[j][i] = nv;
+    err = null; fb.textContent = "";
+    draw();
+  });
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "reset") { m = G.v.map(() => new Array(n).fill(0)); err = null; fb.className = "fb"; fb.textContent = ""; return draw(); }
+    if (a !== "check") return;
+    let bad = 0;
+    err = G.v.map((_, i) => G.v.map((__, j) => { const wrong = m[i][j] !== truth[i][j]; if (wrong) bad++; return wrong; }));
+    fb.className = "fb " + (bad ? "bad" : "good");
+    fb.textContent = bad
+      ? `Неверных ячеек: ${bad} (подсвечены красным). Проверь по графу: линия между вершинами — это единица в двух ячейках.`
+      : `Всё верно! Единиц ${G.e.length * 2}, рёбер ${G.e.length} — каждое записано дважды.`;
+    draw();
+  });
+  draw();
+}
+
+function initGraphList(el) {
+  const G = parseG(el);
+  el.classList.add("gwrap");
+  const row = h("div", "gm-row"), gbox = h("div"), lbox = h("div", "glist");
+  const note = h("p", "pnote");
+  row.append(gbox, lbox); el.append(row, note);
+  let act = null;
+  function draw() {
+    const nb = act ? G.adj[G.idx[act]].map(i => G.v[i]) : [];
+    gbox.innerHTML = gsvg(G, act ? { active: act, nodes: nb, edges: G.e.filter(([a, b]) => a === act || b === act).map(([a, b]) => a + "-" + b) } : {});
+    lbox.innerHTML = G.v.map(x => `<button type="button" class="grow${x === act ? " on" : ""}" data-v="${x}"><b>${x}</b> → ${G.adj[G.idx[x]].map(i => `<span class="gchip">${G.v[i]}</span>`).join(" ") || "<span class=\"gchip\">пусто</span>"}</button>`).join("");
+    note.textContent = act ? `У вершины ${act} в списке ${nb.length} соседей: ${nb.join(", ")}` : "Кликни по строке списка или по вершине графа.";
+  }
+  el.addEventListener("click", e => {
+    const t = e.target.closest("[data-v]"); if (!t) return;
+    act = act === t.dataset.v ? null : t.dataset.v;
+    draw();
+  });
+  draw();
+}
+
+function initListQuiz(el) {
+  const G = parseG(el);
+  el.classList.add("gwrap");
+  let step = 0, sel = [], done = [];
+  const gbox = h("div"), q = h("p", "q"), fb = h("p", "fb"), lbox = h("div", "glist");
+  const ctr = h("div", "row", `<button class="btn primary" type="button" data-a="ok">Готово</button><button class="btn ghost" type="button" data-a="reset">Начать заново</button>`);
+  el.append(gbox, q, ctr, fb, lbox);
+  function draw() {
+    const cur = G.v[step];
+    gbox.innerHTML = gsvg(G, step < G.v.length ? { active: cur, sel } : {});
+    q.innerHTML = step < G.v.length
+      ? `Кликай по соседям вершины <b>${cur}</b> (она выделена синим), потом нажми «Готово».`
+      : `Список собран полностью.`;
+    lbox.innerHTML = done.map((d, i) => `<div class="grow"><b>${G.v[i]}</b> → ${d.map(x => `<span class="gchip">${x}</span>`).join(" ") || "<span class=\"gchip\">пусто</span>"}</div>`).join("");
+    $$('[data-a="ok"]', ctr).forEach(b => b.disabled = step >= G.v.length);
+  }
+  gbox.addEventListener("click", e => {
+    const g = e.target.closest("[data-v]"); if (!g || step >= G.v.length) return;
+    const x = g.dataset.v;
+    if (x === G.v[step]) { fb.className = "fb bad"; fb.textContent = "Вершина не бывает соседом самой себе."; return; }
+    sel = sel.includes(x) ? sel.filter(y => y !== x) : sel.concat(x);
+    fb.textContent = "";
+    draw();
+  });
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "reset") { step = 0; sel = []; done = []; fb.className = "fb"; fb.textContent = ""; return draw(); }
+    if (a !== "ok" || step >= G.v.length) return;
+    const cur = G.v[step];
+    const right = G.adj[G.idx[cur]].map(i => G.v[i]).sort();
+    const got = sel.slice().sort();
+    if (right.join() !== got.join()) {
+      fb.className = "fb bad";
+      fb.textContent = `Не совсем: у ${cur} должно быть ${right.length} соседей. Посмотри, какие линии выходят из ${cur}.`;
+      return;
+    }
+    done.push(right); step++; sel = [];
+    fb.className = "fb good";
+    fb.textContent = step >= G.v.length
+      ? `Готово! Весь список смежности собран. Всего чисел в нём ${G.e.length * 2} — вдвое больше, чем рёбер.`
+      : `Верно! Теперь вершина ${G.v[step]}.`;
+    draw();
+  });
+  draw();
+}
+
+/* ═════════ ВИДЖЕТЫ ПРО РЕКУРСИЮ ═════════ */
+function initNest(el) {
+  const n = +el.dataset.n || 5;
+  let inner = "";
+  for (let i = 1; i <= n; i++) {
+    inner = `<div class="nbox${i === 1 ? " base" : ""}"><span class="lbl">${i === 1 ? "самая маленькая:<br>не открывается" : "матрёшка " + i}</span>${inner ? `<div class="inner" hidden>${inner}</div>` : ""}</div>`;
+  }
+  const wrap = h("div", "nest", inner), note = h("p", "pnote");
+  const ctr = h("div", "row", `<button class="btn primary" type="button" data-a="open">Открыть ▶</button><button class="btn ghost" type="button" data-a="close">Собрать обратно</button>`);
+  el.append(wrap, note, ctr);
+  const inners = $$(".inner", wrap);
+  let open = 0;
+  function draw() {
+    inners.forEach((d, i) => d.hidden = i >= open);
+    $('[data-a="open"]', ctr).disabled = open >= inners.length;
+    note.textContent = open === 0 ? "Закрытая матрёшка. Открой её." :
+      open >= inners.length ? "Дошли до самой маленькой — она не открывается. Это базовый случай: дальше рекурсия не идёт." :
+      `Открыли ${open}: внутри снова матрёшка, только меньше. Та же задача!`;
+  }
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "open") open = Math.min(inners.length, open + 1);
+    if (a === "close") open = 0;
+    draw();
+  });
+  draw();
+}
+
+function initQueue(el) {
+  const n = +el.dataset.n || 5;
+  const S = [], bub = new Array(n).fill("");
+  S.push({ act: n - 1, bub: bub.slice(), note: `Ты стоишь последним и спрашиваешь у того, кто впереди: «Ты какой по счёту?»` });
+  for (let k = n - 1; k > 0; k--) {
+    bub[k] = "?";
+    S.push({ act: k - 1, bub: bub.slice(), note: k - 1 === 0 ? "Вопрос дошёл до первого в очереди." : "Он тоже не знает и спрашивает того, кто впереди него." });
+  }
+  bub[0] = "я 1-й";
+  S.push({ act: 0, base: true, bub: bub.slice(), note: "Первый знает ответ сам, никого не спрашивая. Это базовый случай — теперь ответы пойдут обратно." });
+  for (let k = 1; k < n; k++) {
+    bub[k] = `${k + 1}-й`;
+    S.push({ act: k, bub: bub.slice(), note: `Берёт ответ соседа (${k}) и прибавляет 1 → ${k + 1}` });
+  }
+  S.push({ act: -1, bub: bub.slice(), note: `Готово: ты ${n}-й. Никто не считал всю очередь — каждый сделал ровно один шаг.` });
+  const row = h("div", "qrow"), note = h("p", "pnote"), ctr = h("div", "row");
+  note.setAttribute("aria-live", "polite");
+  ctr.innerHTML = `<button class="btn primary" type="button" data-a="step">Шаг ▶</button><button class="btn" type="button" data-a="back">◀ Назад</button><button class="btn ghost" type="button" data-a="reset">⟲ Сначала</button>`;
+  el.append(row, note, ctr);
+  let k = 0;
+  function draw() {
+    const s = S[k];
+    row.innerHTML = s.bub.map((b, i) => `<div class="person${i === s.act ? " act" : ""}${i === 0 && s.base ? " base" : ""}">
+      <span class="fig">${b || "?"}</span><span class="cap">${i === 0 ? "первый" : i === n - 1 ? "ты" : ""}</span></div>`).join("");
+    note.textContent = s.note;
+    $('[data-a="back"]', ctr).disabled = k === 0;
+    $('[data-a="step"]', ctr).disabled = k === S.length - 1;
+  }
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "step") k = Math.min(S.length - 1, k + 1);
+    if (a === "back") k = Math.max(0, k - 1);
+    if (a === "reset") k = 0;
+    draw();
+  });
+  draw();
+}
+
+function initCallStack(el) {
+  const nobase = el.dataset.mode === "nobase", N = +el.dataset.n || 4;
+  const frames = h("div", "frames"), note = h("p", "pnote"), ctr = h("div", "row");
+  note.setAttribute("aria-live", "polite");
+  ctr.innerHTML = `<button class="btn ghost" type="button" data-a="reset">⟲ Сначала</button><button class="btn" type="button" data-a="back">◀ Назад</button><button class="btn primary" type="button" data-a="step">Шаг ▶</button><button class="btn" type="button" data-a="play">▶ Авто</button>`;
+  el.append(frames, note, ctr);
+  function buildFact(n0) {
+    const S = [], st = [];
+    (function f(n) {
+      st.push({ l: `factorial(${n})`, r: null, base: n <= 1 });
+      S.push({ st: st.map(o => ({ ...o })), note: n <= 1 ? `factorial(${n}) — базовый случай: ответ 1 известен сразу` : `Вызвали factorial(${n}). Ответить он пока не может — ждёт factorial(${n - 1})` });
+      let inner = 1, r;
+      if (n <= 1) r = 1; else { inner = f(n - 1); r = n * inner; }
+      st[st.length - 1].r = r;
+      S.push({ st: st.map(o => ({ ...o })), note: n <= 1 ? `factorial(${n}) вернул 1 и снялся со стека` : `Пришёл ответ ${inner}. Считаем ${n} · ${inner} = ${r}, снимаем factorial(${n}) со стека` });
+      st.pop();
+      return r;
+    })(n0);
+    let f = 1; for (let i = 2; i <= n0; i++) f *= i;
+    S.push({ st: [], note: `Стек пуст, все вызовы закончились. Итог: ${n0}! = ${f}` });
+    return S;
+  }
+  function buildBad() {
+    const S = [], st = [];
+    for (let i = 5; i >= -5; i--) {
+      st.push({ l: `bad(${i})`, r: null });
+      S.push({ st: st.map(o => ({ ...o })), note: `bad(${i}) вызвал bad(${i - 1}). Остановки нет — стопка вызовов только растёт` });
+    }
+    S.push({ st: st.map(o => ({ ...o })), over: true, note: "Место в стеке закончилось — программа падает с StackOverflowError" });
+    return S;
+  }
+  const S = nobase ? buildBad() : buildFact(N);
+  let k = 0, timer = null;
+  function render() {
+    const s = S[k];
+    frames.innerHTML = s.st.map(f => `<div class="frame ${f.r != null ? "ret" : f.base ? "base" : ""}"><span>${f.l}</span><span class="st">${f.r != null ? "→ " + f.r : "ждёт"}</span></div>`).join("")
+      + (s.over ? `<div class="frame over">StackOverflowError</div>` : "");
+    note.textContent = s.note;
+    $('[data-a="back"]', ctr).disabled = k === 0;
+    $('[data-a="step"]', ctr).disabled = k === S.length - 1;
+  }
+  function stop() { clearInterval(timer); timer = null; $('[data-a="play"]', ctr).textContent = "▶ Авто"; }
+  function play() {
+    if (k >= S.length - 1) k = 0;
+    $('[data-a="play"]', ctr).textContent = "❚❚ Пауза";
+    timer = setInterval(() => { if (k < S.length - 1) { k++; render(); } else stop(); }, 900);
+  }
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a; if (!a) return;
+    if (a === "reset") { stop(); k = 0; render(); }
+    if (a === "back") { stop(); k = Math.max(0, k - 1); render(); }
+    if (a === "step") { stop(); k = Math.min(S.length - 1, k + 1); render(); }
+    if (a === "play") timer ? stop() : play();
+  });
+  pauseHooks.push(stop);
+  render();
+}
+
+function initFibTree(el) {
+  const N = +el.dataset.n || 5;
+  let memoMode = false, dupMode = false, cur = null;
+  const wrap = h("div", "ftree"), info = h("div", "stats"), ctr = h("div", "row");
+  ctr.innerHTML = `<button class="btn" type="button" data-a="dup" aria-pressed="false">Подсветить повторы</button><button class="btn" type="button" data-a="memo" aria-pressed="false">С мемоизацией</button>`;
+  el.append(wrap, info, ctr);
+  function build() {
+    let calls = 0; const seen = new Set();
+    const node = n => {
+      calls++;
+      if (n <= 1) return { n, leaf: true };
+      if (memoMode && seen.has(n)) return { n, memo: true };
+      if (memoMode) seen.add(n);
+      return { n, kids: [node(n - 1), node(n - 2)] };
+    };
+    const root = node(N), cnt = {};
+    (function walk(x) { cnt[x.n] = (cnt[x.n] || 0) + 1; (x.kids || []).forEach(walk); })(root);
+    return { root, calls, cnt };
+  }
+  function render(x) {
+    const cls = x.memo ? "memo" : x.leaf ? "leaf" : dupMode && !memoMode && cur.cnt[x.n] > 1 ? "dup" : "";
+    return `<div class="tn"><span class="nb ${cls}">fib(${x.n})${x.memo ? " — из таблицы" : ""}</span>${x.kids ? `<div class="kids">${x.kids.map(render).join("")}</div>` : ""}</div>`;
+  }
+  function draw() {
+    cur = build();
+    wrap.innerHTML = render(cur.root);
+    info.innerHTML = `<span>Вызовов: <b>${cur.calls}</b></span>` + (memoMode ? `<span>Пунктирные — ответ взяли из таблицы, дальше не считаем</span>` : `<span>Зелёные — базовые случаи</span>`);
+    $('[data-a="memo"]', ctr).setAttribute("aria-pressed", memoMode);
+    $('[data-a="memo"]', ctr).classList.toggle("primary", memoMode);
+    $('[data-a="dup"]', ctr).setAttribute("aria-pressed", dupMode);
+    $('[data-a="dup"]', ctr).classList.toggle("primary", dupMode);
+    $('[data-a="dup"]', ctr).disabled = memoMode;
+  }
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "memo") memoMode = !memoMode;
+    if (a === "dup") dupMode = !dupMode;
+    draw();
+  });
+  draw();
+}
+
+function initHanoi(el) {
+  const auto = el.dataset.mode === "auto";
+  const NAMES = ["A", "B", "C"];
+  let n = +el.dataset.n || 3, pegs, sel = -1, moves = 0, seq = [], k = 0, timer = null;
+  const wrap = h("div", "hanoi-wrap"), pegsEl = h("div", "pegs"), note = h("p", "pnote"), ctr = h("div", "row");
+  note.setAttribute("aria-live", "polite");
+  wrap.appendChild(pegsEl);
+  ctr.innerHTML = (auto
+    ? `<button class="btn ghost" type="button" data-a="reset">⟲ Сначала</button><button class="btn primary" type="button" data-a="step">Шаг ▶</button><button class="btn" type="button" data-a="play">▶ Авто</button>`
+    : `<button class="btn ghost" type="button" data-a="reset">⟲ Сначала</button>`)
+    + `<label class="fill" style="gap:6px"><span>дисков:</span><select class="speed" data-a="n"><option>3</option><option>4</option><option>5</option></select></label>
+       <span class="stats"><span>ходов: <b class="mv-count">0</b></span></span>`;
+  el.append(wrap, note, ctr);
+  $('[data-a="n"]', ctr).value = String(n);
+  function solve(m, from, to, via, out) { if (m === 0) return out; solve(m - 1, from, via, to, out); out.push([from, to, m]); solve(m - 1, via, to, from, out); return out; }
+  const minMoves = () => Math.pow(2, n) - 1;
+  function reset() {
+    pegs = [[], [], []];
+    for (let d = n; d >= 1; d--) pegs[0].push(d);
+    sel = -1; moves = 0; k = 0;
+    if (auto) seq = solve(n, 0, 2, 1, []);
+    draw();
+    note.textContent = auto ? `Нажимай «Шаг»: рекурсия перенесёт ${n} дисков за ${minMoves()} ходов.` : `Перенеси всю башню на стержень C. Минимум ходов: ${minMoves()}.`;
+  }
+  function draw(last) {
+    pegsEl.innerHTML = pegs.map((p, i) => `<div class="peg${i === sel ? " sel" : ""}" data-i="${i}">${[...p].reverse().map((d, idx) =>
+      `<div class="disc${i === sel && idx === 0 ? " lift" : ""}${last && last[1] === i && idx === 0 ? " mv" : ""}" style="width:${26 + d * 17}px;background:color-mix(in srgb,var(--pen) ${12 + d * 13}%,var(--surface))">${d}</div>`).join("")}<span class="name">${NAMES[i]}</span></div>`).join("");
+    $(".mv-count", ctr).textContent = moves;
+  }
+  pegsEl.addEventListener("click", e => {
+    if (auto) return;
+    const p = e.target.closest(".peg"); if (!p) return;
+    const i = +p.dataset.i;
+    if (sel < 0) {
+      if (!pegs[i].length) { note.textContent = "На этом стержне нет дисков."; return; }
+      sel = i; note.textContent = `Взяли диск ${pegs[i][pegs[i].length - 1]} со стержня ${NAMES[i]}. Куда положим?`; draw(); return;
+    }
+    if (i === sel) { sel = -1; note.textContent = "Положили обратно."; draw(); return; }
+    const d = pegs[sel][pegs[sel].length - 1], t = pegs[i][pegs[i].length - 1];
+    if (t && d > t) { note.textContent = `Нельзя: диск ${d} больше диска ${t}. Большой на маленький не кладём.`; return; }
+    const from = sel;
+    pegs[i].push(pegs[sel].pop()); moves++; sel = -1;
+    draw([from, i]);
+    if (pegs[2].length === n) note.textContent = moves === minMoves() ? `Победа за ${moves} ходов — это минимум!` : `Собрано за ${moves} ходов. Минимум — ${minMoves()}, попробуй ещё раз.`;
+    else note.textContent = `Ход ${moves}: диск ${d}: ${NAMES[from]} → ${NAMES[i]}`;
+  });
+  function step() {
+    if (k >= seq.length) return false;
+    const mv = seq[k++];
+    pegs[mv[1]].push(pegs[mv[0]].pop());
+    moves = k; draw(mv);
+    note.textContent = `Ход ${k}: диск ${mv[2]}: ${NAMES[mv[0]]} → ${NAMES[mv[1]]}` + (k >= seq.length ? ` — башня собрана за ${seq.length} ходов` : "");
+    return k < seq.length;
+  }
+  function stop() { clearInterval(timer); timer = null; const b = $('[data-a="play"]', ctr); if (b) b.textContent = "▶ Авто"; }
+  function play() { if (k >= seq.length) reset(); $('[data-a="play"]', ctr).textContent = "❚❚ Пауза"; timer = setInterval(() => { if (!step()) stop(); }, 650); }
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a; if (!a) return;
+    if (a === "reset") { stop(); reset(); }
+    if (a === "step") { stop(); step(); }
+    if (a === "play") timer ? stop() : play();
+  });
+  $('[data-a="n"]', ctr).addEventListener("change", e => { stop(); n = +e.target.value; reset(); });
+  pauseHooks.push(stop);
+  reset();
+}
+
+function initStackDemo(el) {
+  let st = [], log = [];
+  el.innerHTML = `<div class="sd-stack"></div>
+    <div class="row" style="margin-top:10px"><label class="fill" style="gap:6px"><span>значение:</span><input type="text" inputmode="numeric" class="sv" value="5" style="width:6ch"></label>
+    <button class="btn primary" type="button" data-a="push">Push</button><button class="btn" type="button" data-a="pop">Pop</button><button class="btn" type="button" data-a="pick">Pick</button><button class="btn ghost" type="button" data-a="clear">Очистить</button></div>
+    <p class="out"></p>`;
+  const box = $(".sd-stack", el), out = $(".out", el), inp = $(".sv", el);
+  function draw() {
+    box.innerHTML = st.length ? st.map((v, i) => `<div class="sd-item${i === st.length - 1 ? " top" : ""}">${esc(v)}${i === st.length - 1 ? " ← верх" : ""}</div>`).join("") : `<span class="hand" style="font-size:1.2rem">стек пуст</span>`;
+    out.textContent = log.slice(-6).join("\n") || "Вывод программы появится здесь";
+  }
+  el.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a; if (!a) return;
+    if (a === "push") { const v = inp.value.trim() || String(1 + ((Math.random() * 9) | 0)); st.push(v); log.push(`Push(${v})`); inp.value = String(1 + ((Math.random() * 9) | 0)); }
+    if (a === "pop") log.push(st.length ? `Pop() → ${st.pop()}` : "Pop() → стек пуст!");
+    if (a === "pick") log.push(st.length ? `Pick() → ${st[st.length - 1]}` : "Pick() → стек пуст!");
+    if (a === "clear") { st = []; log = []; }
+    draw();
+  });
+  draw();
+}
+
+function initListDemo(el) {
+  let list = [3, 7], log = [];
+  el.innerHTML = `<div class="nodes"></div>
+    <div class="row" style="margin-top:10px"><label class="fill" style="gap:6px"><span>значение:</span><input type="text" inputmode="numeric" class="lv" value="5" style="width:6ch"></label>
+    <button class="btn primary" type="button" data-a="af">AddFirst</button><button class="btn primary" type="button" data-a="al">AddLast</button>
+    <button class="btn" type="button" data-a="rf">removeFirst</button><button class="btn" type="button" data-a="rl">removeLast</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn ghost" type="button" data-a="pf">printForward</button><button class="btn ghost" type="button" data-a="pb">printBackward</button><button class="btn ghost" type="button" data-a="clear">Очистить</button></div>
+    <p class="out"></p>`;
+  const nodes = $(".nodes", el), out = $(".out", el), inp = $(".lv", el);
+  function draw() {
+    nodes.innerHTML = list.length
+      ? list.map((v, i) => { const t = [i === 0 ? "head" : "", i === list.length - 1 ? "tail" : ""].filter(Boolean).join(" "); return `<div class="lnode">${v}<span class="tg">${t}</span></div>`; }).join(`<span class="arrow">⇄</span>`)
+      : `<span class="hand" style="font-size:1.2rem">список пуст</span>`;
+    out.textContent = log.slice(-5).join("\n") || "Вывод программы появится здесь";
+  }
+  el.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a; if (!a) return;
+    const v = inp.value.trim() || String(1 + ((Math.random() * 9) | 0));
+    if (a === "af") { list.unshift(v); log.push(`AddFirst(${v})`); }
+    if (a === "al") { list.push(v); log.push(`AddLast(${v})`); }
+    if (a === "rf") log.push(list.length ? `removeFirst() → убрали ${list.shift()}` : "removeFirst() → список пуст!");
+    if (a === "rl") log.push(list.length ? `removeLast() → убрали ${list.pop()}` : "removeLast() → список пуст!");
+    if (a === "pf") log.push(`printForward:  ${list.join(" ") || "(пусто)"}`);
+    if (a === "pb") log.push(`printBackward: ${list.slice().reverse().join(" ") || "(пусто)"}`);
+    if (a === "clear") { list = []; log = []; }
+    if (a === "af" || a === "al") inp.value = String(1 + ((Math.random() * 9) | 0));
+    draw();
+  });
+  draw();
+}
+
+/* ═════════ NEW WIDGETS ═════════ */
+function initSortDemo(el) {
+  const vals = el.dataset.arr.split(",").map(Number), part = el.dataset.mode === "partition";
+  const viz = h("div", "viz short"), cap = h("p", "sd-cap"), row = h("div", "row");
+  el.append(viz, cap, row);
+  const R = makeViz(viz, { noBracket: true });
+  const base = vals.map((v, id) => ({ v, id })), pv = base[base.length - 1];
+  const target = part ? [...base.filter(o => o.v < pv.v), pv, ...base.filter(o => o.v > pv.v)] : base.slice().sort((x, y) => x.v - y.v);
+  const li = target.indexOf(pv);
+  const before = { a: base, hl: part ? { [base.length - 1]: "pivot" } : {}, done: [], ptr: {}, range: null };
+  const afterHl = {}; if (part) for (let k = 0; k < li; k++) afterHl[k] = "less";
+  const after = { a: target, hl: afterHl, done: part ? [li] : target.map((_, k) => k), ptr: {}, range: null };
+  let on = false;
+  const btn = h("button", "btn primary"); btn.type = "button"; row.appendChild(btn);
+  function draw() {
+    R.draw(on ? after : before);
+    btn.textContent = on ? "↺ Вернуть как было" : part ? `Разбить относительно ${pv.v} ▶` : "Отсортировать ▶";
+    cap.textContent = part
+      ? (on ? `Слева — меньше ${pv.v}, справа — больше. Сам ${pv.v} — на своём месте.` : `Беспорядок. Опорный — ${pv.v} (фиолетовый).`)
+      : (on ? "Порядок: каждое следующее число не меньше предыдущего." : "Беспорядок: числа стоят как попало.");
+  }
+  btn.addEventListener("click", () => { on = !on; draw(); });
+  onShow(el, draw);
+  window.addEventListener("resize", () => { if (!el.closest(".slide").hidden) draw(); });
+}
+
+function initCompare(el) {
+  el.innerHTML = `<div class="cmp-row"><div class="sbox"><span class="card">?</span><span>a[0]</span></div><span class="cmp-op">?</span><div class="sbox"><span class="card">?</span><span>a[1]</span></div></div>
+    <p class="pnote" aria-live="polite"></p>
+    <div class="row"><button class="btn primary" type="button" data-a="cmp">Сравнить: a[0] &gt; a[1]?</button><button class="btn ghost" type="button" data-a="new">Другие числа</button></div>`;
+  const cards = $$(".card", el), op = $(".cmp-op", el), note = $(".pnote", el);
+  let x, y;
+  function fresh() { [x, y] = uniq(2, 9); cards[0].textContent = x; cards[1].textContent = y; cards.forEach(c => c.classList.remove("big")); op.textContent = "?"; note.textContent = "Кто больше? Нажми «Сравнить»."; }
+  el.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "new") fresh();
+    if (a === "cmp") {
+      op.textContent = x > y ? ">" : "<";
+      cards.forEach(c => c.classList.remove("big")); cards[x > y ? 0 : 1].classList.add("big");
+      note.innerHTML = `a[0] &gt; a[1] → ${x} &gt; ${y} → <b>${x > y}</b>` + (x > y ? " — левый больше, их нужно поменять местами." : " — порядок верный, ничего не делаем.");
+    }
+  });
+  fresh();
+}
+
+function initSwap(el) {
+  el.innerHTML = `<div class="swap-boxes"><div class="sbox"><span class="card" data-b="a0">5</span><span>a[0]</span></div><div class="sbox"><span class="card" data-b="a1">9</span><span>a[1]</span></div><div class="sbox tmpbox"><span class="card tmp" data-b="tmp">—</span><span>tmp</span></div></div>
+    <ol class="codelines" style="margin-top:14px"></ol><p class="pnote" aria-live="polite"></p>
+    <div class="row"><button class="btn primary" type="button" data-a="next">Следующая строка ▶</button><button class="btn ghost" type="button" data-a="reset">Сначала</button><button class="btn" type="button" data-a="bad">Попробовать без tmp</button></div>`;
+  const PROGS = {
+    good: [
+      { c: "int tmp = a[0];", to: "tmp", from: "a0", n: "Запомнили 5 во временной переменной tmp." },
+      { c: "a[0] = a[1];", to: "a0", from: "a1", n: "В a[0] записали 9. Пятёрка не потерялась — она лежит в tmp." },
+      { c: "a[1] = tmp;", to: "a1", from: "tmp", n: "В a[1] положили 5 из tmp. Готово: a = {9, 5}!" }
+    ],
+    bad: [
+      { c: "a[0] = a[1];", to: "a0", from: "a1", n: "В a[0] записали 9… а пятёрка стёрлась!" },
+      { c: "a[1] = a[0];", to: "a1", from: "a0", n: "В a[1] скопировали a[0], а там уже 9. Получилось {9, 9} — пятёрка потеряна." }
+    ]
+  };
+  let mode = "good", k = 0, vals;
+  const box = n => $(`[data-b="${n}"]`, el), ol = $(".codelines", el), note = $(".pnote", el), tmpBox = $(".tmpbox", el);
+  function reset(m) {
+    mode = m; k = 0; vals = { a0: 5, a1: 9, tmp: "—" }; draw();
+    note.textContent = mode === "good" ? "Сейчас a = {5, 9}. Хотим получить {9, 5}." : "Пробуем без tmp. Сейчас a = {5, 9}.";
+    $('[data-a="bad"]', el).textContent = mode === "good" ? "Попробовать без tmp" : "Вернуть tmp";
+  }
+  function draw() {
+    ["a0", "a1", "tmp"].forEach(n => box(n).textContent = vals[n]);
+    tmpBox.style.visibility = mode === "good" ? "visible" : "hidden";
+    ol.innerHTML = PROGS[mode].map((l, i) => `<li class="${i === k - 1 ? "cur" : i < k - 1 ? "past" : ""}">${esc(l.c)}</li>`).join("");
+    $('[data-a="next"]', el).disabled = k >= PROGS[mode].length;
+  }
+  el.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a; if (!a) return;
+    if (a === "next") {
+      const L = PROGS[mode][k]; vals[L.to] = vals[L.from]; k++; draw();
+      const b = box(L.to); b.classList.remove("flash"); void b.offsetWidth; b.classList.add("flash");
+      note.textContent = L.n;
+    }
+    if (a === "reset") reset(mode);
+    if (a === "bad") reset(mode === "good" ? "bad" : "good");
+  });
+  reset("good");
+}
+
+function initBubbleHand(el) {
+  const start = el.dataset.arr.split(",").map(Number), n = start.length;
+  let a, pass, j, cmp, swp, fin, passSwaps;
+  el.innerHTML = `<div class="cards bh"></div><p class="q bh-q" style="margin-top:14px"></p><div class="row bh-btns"></div><p class="fb"></p>
+    <div class="stats bh-stats"></div>
+    <div class="row" style="margin-top:10px"><button class="btn ghost" type="button" data-a="auto">Досортировать автоматически</button><button class="btn ghost" type="button" data-a="reset">Начать заново</button></div>`;
+  const cardsEl = $(".bh", el), q = $(".bh-q", el), btns = $(".bh-btns", el), fb = $(".fb", el), stats = $(".bh-stats", el);
+  function reset() { a = start.slice(); pass = 0; j = 0; cmp = 0; swp = 0; fin = false; passSwaps = 0; fb.className = "fb"; fb.textContent = ""; draw(); }
+  function draw() {
+    const doneFrom = fin ? 0 : n - pass;
+    cardsEl.innerHTML = a.map((v, k) => `<span class="card small${!fin && (k === j || k === j + 1) ? " sel" : ""}${k >= doneFrom ? " fin" : ""}">${v}</span>`).join("");
+    stats.innerHTML = `<span>Проход: <b>${Math.min(pass + 1, n - 1)}</b></span><span>Сравнений: <b>${cmp}</b></span><span>Обменов: <b>${swp}</b></span>`;
+    if (fin) { q.textContent = "Массив отсортирован!"; btns.innerHTML = ""; return; }
+    q.innerHTML = `Проход ${pass + 1}. Соседи <b>${a[j]}</b> и <b>${a[j + 1]}</b>: левый больше правого?`;
+    btns.innerHTML = `<button class="btn primary" type="button" data-c="swap">Да — поменять местами</button><button class="btn" type="button" data-c="keep">Нет — оставить</button>`;
+  }
+  function advance() {
+    j++;
+    if (j < n - 1 - pass) return;
+    const top = a[n - 1 - pass];
+    pass++; j = 0;
+    if (pass >= n - 1 || passSwaps === 0) {
+      fin = true; fb.className = "fb good";
+      fb.textContent = pass < n - 1 ? `За весь проход не было обменов — значит, всё уже по порядку. Сравнений: ${cmp}, обменов: ${swp}.` : `Готово! Сравнений: ${cmp}, обменов: ${swp}. Так и работает пузырёк.`;
+    } else { fb.className = "fb good"; fb.textContent = `Проход закончен: ${top} всплыл в конец и стал зелёным. Следующий проход — снова с начала.`; }
+    passSwaps = 0;
+  }
+  el.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.a === "reset") return reset();
+    if (b.dataset.a === "auto") { a.sort((x, y) => x - y); fin = true; fb.className = "fb"; fb.textContent = "Досортировали автоматически — дальше всё повторяется так же."; return draw(); }
+    const c = b.dataset.c; if (!c) return;
+    const need = a[j] > a[j + 1] ? "swap" : "keep";
+    if (c !== need) { fb.className = "fb bad"; fb.textContent = need === "swap" ? `${a[j]} больше ${a[j + 1]} — левый больше, нужно поменять.` : `${a[j]} меньше ${a[j + 1]} — порядок верный, менять не нужно.`; return; }
+    cmp++;
+    if (c === "swap") { [a[j], a[j + 1]] = [a[j + 1], a[j]]; swp++; passSwaps++; }
+    fb.className = "fb good"; fb.textContent = c === "swap" ? "Поменяли!" : "Верно, оставляем.";
+    advance(); draw();
+  });
+  reset();
+}
+
+function initMSHand(el) {
+  const start = el.dataset.arr.split(",").map(Number);
+  let groups, next, p, L, Rr, out, level, done;
+  el.innerHTML = `<p class="q ms-level"></p><div class="groups ms-groups"></div><div class="piles ms-piles"></div><p class="fb"></p>
+    <div class="row" style="margin-top:10px"><button class="btn ghost" type="button" data-a="reset">Начать заново</button></div>`;
+  const lvl = $(".ms-level", el), gEl = $(".ms-groups", el), piles = $(".ms-piles", el), fb = $(".fb", el);
+  const grp = (g, cls) => `<span class="grp ${cls}">${g.map(v => `<span>${v}</span>`).join("")}</span>`;
+  function loadPair() {
+    while (p < groups.length && p + 1 >= groups.length) { next.push(groups[p]); p++; }
+    if (p >= groups.length) {
+      groups = next; next = []; p = 0; level++;
+      if (groups.length === 1) { done = true; return; }
+      return loadPair();
+    }
+    L = groups[p].slice(); Rr = groups[p + 1].slice(); out = [];
+  }
+  function reset() { groups = start.map(v => [v]); next = []; p = 0; level = 1; done = false; loadPair(); fb.className = "fb"; fb.textContent = "Все группы по одному элементу. Сливай первую пару."; draw(); }
+  function draw() {
+    if (done) { lvl.textContent = "Всё слито в одну группу!"; gEl.innerHTML = grp(groups[0], "fin"); piles.innerHTML = ""; return; }
+    lvl.textContent = `Уровень ${level}: сливаем группы по ${groups[p].length} — пара ${p / 2 + 1} из ${Math.floor(groups.length / 2)}`;
+    gEl.innerHTML = next.map(g => grp(g, "fin")).join("") + grp(groups[p], "cur") + grp(groups[p + 1], "cur") + groups.slice(p + 2).map(g => grp(g, "wait")).join("");
+    const pile = (arr, name) => arr.map((x, i) => `<button type="button" class="card small${i === 0 ? " head" : ""}" data-p="${name}" ${i ? "disabled" : ""}>${x}</button>`).join("") || `<span class="hand" style="font-size:1.1rem">пусто</span>`;
+    piles.innerHTML = `<span class="lbl">Левая</span><div class="cards">${pile(L, "L")}</div><span class="lbl">Правая</span><div class="cards">${pile(Rr, "R")}</div>
+      <span class="lbl">Результат</span><div class="cards">${out.map(x => `<span class="card small fin">${x}</span>`).join("") || `<span class="hand" style="font-size:1.1rem">пока пусто</span>`}</div>`;
+  }
+  piles.addEventListener("click", e => {
+    const c = e.target.closest(".card.head"); if (!c || done) return;
+    const mine = c.dataset.p === "L" ? L : Rr, other = c.dataset.p === "L" ? Rr : L;
+    if (other.length && mine[0] > other[0]) {
+      c.classList.remove("shake"); void c.offsetWidth; c.classList.add("shake");
+      fb.className = "fb bad"; fb.textContent = `${mine[0]} больше, чем ${other[0]}. Бери меньшую из двух первых.`; return;
+    }
+    out.push(mine.shift());
+    if (!L.length && !Rr.length) {
+      const merged = out, lv = level;
+      next.push(out); p += 2; loadPair();
+      fb.className = "fb good";
+      if (done) fb.textContent = `Готово! [${groups[0].join(", ")}] — ты отсортировал массив слиянием своими руками.`;
+      else if (level !== lv) fb.textContent = `Уровень ${lv} слит! Теперь группы по ${groups[0].length} — сливаем их так же.`;
+      else fb.textContent = `Группа [${merged.join(", ")}] готова. Следующая пара.`;
+    } else if (!L.length || !Rr.length) { fb.className = "fb good"; fb.textContent = "Одна группа кончилась — остаток другой переносим по порядку."; }
+    else { fb.className = "fb good"; fb.textContent = "Верно!"; }
+    draw();
+  });
+  reset();
+}
+
+function initQuickTree(el) {
+  const vals = el.dataset.arr.split(",").map(Number);
+  let row = [{ t: "g", v: vals }];
+  const rows = [row];
+  while (row.some(x => x.t === "g" && x.v.length > 1)) {
+    const nr = [];
+    row.forEach(x => {
+      if (x.t !== "g" || x.v.length <= 1) return nr.push(x);
+      const pv = x.v[x.v.length - 1], rest = x.v.slice(0, -1);
+      const less = rest.filter(v => v < pv), more = rest.filter(v => v > pv);
+      if (less.length) nr.push({ t: "g", v: less });
+      nr.push({ t: "p", v: [pv] });
+      if (more.length) nr.push({ t: "g", v: more });
+    });
+    rows.push(nr); row = nr;
+  }
+  if (row.some(x => x.t === "g")) rows.push(row.map(x => ({ t: "p", v: x.v })));
+  const tree = h("div", "tree");
+  tree.innerHTML = rows.map((r, i) => `<div class="trow"><span class="tag">${i === 0 ? "массив" : i === rows.length - 1 ? "готово" : "разбиваем"}</span>${r.map(x =>
+    x.t === "p" ? `<span class="grp piv"><span>${x.v[0]}</span></span>`
+      : `<span class="grp">${x.v.map((v, k) => `<span${x.v.length > 1 && k === x.v.length - 1 ? ' class="pv"' : ""}>${v}</span>`).join("")}</span>`).join("")}</div>`).join("");
+  const ctr = h("div", "row", `<button class="btn primary" type="button" data-a="next">Дальше ↓</button><button class="btn ghost" type="button" data-a="all">Показать всё</button><button class="btn ghost" type="button" data-a="reset">Сначала</button>`);
+  el.append(tree, ctr);
+  const rowEls = $$(".trow", tree);
+  let shown = 1;
+  const draw = () => { rowEls.forEach((r, i) => r.classList.toggle("off", i >= shown)); $('[data-a="next"]', ctr).disabled = shown >= rowEls.length; };
+  ctr.addEventListener("click", e => {
+    const a = e.target.closest("button")?.dataset.a;
+    if (a === "next") shown = Math.min(rowEls.length, shown + 1);
+    if (a === "all") shown = rowEls.length;
+    if (a === "reset") shown = 1;
+    draw();
+  });
+  draw();
+}
+Object.keys({ final: 1 }).forEach(updateScore);
+
+/* ═════════ NAVIGATION ═════════ */
+const slides = $$(".slide");
+const PART = { "1": "Раздел 1 · Что такое граф", "2": "Раздел 2 · Матрица смежности", "3": "Раздел 3 · Список смежности", "4": "Раздел 4 · Что выбрать", "5": "Раздел 5 · Практика" };
+slides.forEach((s, i) => { const p = $(".page", s); const no = h("span", "no", String(i + 1)); no.setAttribute("aria-hidden", "true"); p.prepend(no); });
+const tocList = $("#tocList");
+let lastPart = "";
+slides.forEach((s, i) => {
+  if (s.dataset.part !== lastPart) { lastPart = s.dataset.part; tocList.insertAdjacentHTML("beforeend", `<li class="part">${PART[lastPart]}</li>`); }
+  tocList.insertAdjacentHTML("beforeend", `<li data-i="${i}"><button type="button" data-go="${i}">${esc(s.dataset.title)}</button></li>`);
+});
+let cur = -1;
+function go(i) {
+  i = Math.max(0, Math.min(slides.length - 1, i));
+  pauseHooks.forEach(f => f());
+  slides.forEach((s, k) => s.hidden = k !== i);
+  const changed = cur !== i;
+  cur = i;
+  const s = slides[i];
+  $("#counter").textContent = `${i + 1} / ${slides.length}`;
+  $("#prog").style.width = ((i + 1) / slides.length * 100) + "%";
+  const chip = $("#partChip"); chip.textContent = PART[s.dataset.part];
+  $("#navTitle").textContent = s.dataset.title;
+  $("#prevBtn").disabled = i === 0; $("#nextBtn").disabled = i === slides.length - 1;
+  $$("li[data-i]", tocList).forEach(li => li.classList.toggle("cur", +li.dataset.i === i));
+  try { history.replaceState(null, "", "#" + (i + 1)); } catch (e) {}
+  store.set("deck-slide", String(i));
+  if (changed) window.scrollTo(0, 0);
+  requestAnimationFrame(() => (showHooks.get(s) || []).forEach(f => f()));
+}
+$("#prevBtn").addEventListener("click", () => go(cur - 1));
+$("#nextBtn").addEventListener("click", () => go(cur + 1));
+const toc = $("#toc");
+$("#tocBtn").addEventListener("click", () => { if (toc.showModal) toc.showModal(); });
+$("#tocClose").addEventListener("click", () => toc.close());
+tocList.addEventListener("click", e => { const b = e.target.closest("[data-go]"); if (b) { toc.close(); go(+b.dataset.go); } });
+document.addEventListener("keydown", e => {
+  if (e.target.closest("input,textarea,select,dialog") || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === "ArrowRight" || e.key === "PageDown") { e.preventDefault(); go(cur + 1); }
+  if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(cur - 1); }
+  if (e.key === "Home") go(0);
+  if (e.key === "End") go(slides.length - 1);
+});
+function start(data) {
+  const fromHash = parseInt(location.hash.slice(1), 10);
+  const saved = parseInt(store.get("deck-slide"), 10);
+  const i = data && Number.isInteger(data.slide) ? data.slide : !Number.isNaN(fromHash) ? fromHash - 1 : !Number.isNaN(saved) ? saved : 0;
+  go(i);
+}
+try { window.claude?.hot?.snapshot?.(() => ({ slide: cur })); } catch (e) {}
+const hot = window.claude?.hot;
+hot?.ready ? hot.ready(start) : start(hot?.data ?? {});
+})();
+</script>

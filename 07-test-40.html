@@ -1,0 +1,339 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>40 вопросов по курсу</title>
+<meta name="description" content="Итоговый тест: связный список, стек, сортировки, бинарный поиск, рекурсия, графы и дерево поиска.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Onest:wght@400;500;700&family=JetBrains+Mono:wght@400;600&family=Caveat:wght@600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --paper:#FAFCFF; --grid:#E3ECF6; --surface:#FFFFFF; --line:#CBD8E8;
+  --ink:#1B2A4A; --ink-2:#4D5B77; --muted:#7A879E;
+  --pen:#2F4FD8; --pen-ink:#FFFFFF; --margin:#E0524A; --marker:#FFE14D; --marker-soft:#FFF3A8;
+  --good:#1D8A4E; --bad:#C8352E; --code-bg:#F1F5FC;
+  --shadow:0 1px 0 rgba(27,42,74,.06), 0 6px 18px rgba(27,42,74,.07);
+  --f-display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --f-body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --f-hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --paper:#16231E; --grid:#1E2E28; --surface:#1C2B25; --line:#33473F;
+    --ink:#EAF1EC; --ink-2:#B4C3BA; --muted:#8A9A91;
+    --pen:#8FB0FF; --pen-ink:#0F1A15; --margin:#FF8A80; --marker:#FFE47A; --marker-soft:#4A4520;
+    --good:#5BD18C; --bad:#FF8A80; --code-bg:#111B17;
+    --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --paper:#16231E; --grid:#1E2E28; --surface:#1C2B25; --line:#33473F;
+  --ink:#EAF1EC; --ink-2:#B4C3BA; --muted:#8A9A91;
+  --pen:#8FB0FF; --pen-ink:#0F1A15; --margin:#FF8A80; --marker:#FFE47A; --marker-soft:#4A4520;
+  --good:#5BD18C; --bad:#FF8A80; --code-bg:#111B17;
+  --shadow:0 1px 0 rgba(0,0,0,.3), 0 8px 22px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background-color:var(--paper); color:var(--ink); font-family:var(--f-body); line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px; background-attachment:fixed; padding-inline:16px;
+}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--pen);outline-offset:2px;border-radius:6px}
+code{font-family:var(--f-mono);font-size:.9em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+mark{background:linear-gradient(transparent 50%,var(--marker-soft) 50%);color:inherit;padding-inline:2px}
+
+.bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  max-width:860px;margin:0 auto;padding-block:10px;background:var(--paper);border-bottom:1px solid var(--line)}
+.brand{font-family:var(--f-display);font-weight:700;font-size:.95rem}
+.brand b{background:linear-gradient(transparent 55%,var(--marker-soft) 55%);padding-inline:2px}
+.chip{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--ink-2);
+  border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.spacer{flex:1}
+.counter{font-family:var(--f-mono);font-size:.85rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.progress{height:4px;background:var(--line);border-radius:2px;overflow:hidden;max-width:860px;margin:0 auto}
+.progress i{display:block;height:100%;background:var(--pen);width:0;transition:width .3s}
+
+.wrap{max-width:860px;margin:0 auto;padding-block:22px 110px}
+.qcard{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:22px 20px;box-shadow:var(--shadow)}
+.topic{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;color:var(--margin)}
+.qtext{font-family:var(--f-display);font-weight:500;font-size:clamp(1.1rem,2.2vw,1.35rem);line-height:1.32;margin:10px 0 20px;text-wrap:balance}
+.ans{display:flex;flex-direction:column;gap:10px}
+.ans button{text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--paper);cursor:pointer;font-size:1rem;transition:border-color .15s,background .15s}
+.ans button:hover{border-color:var(--pen)}
+.ans button[aria-pressed="true"]{border-color:var(--pen);background:color-mix(in srgb,var(--pen) 12%,var(--surface));box-shadow:0 0 0 2px color-mix(in srgb,var(--pen) 24%,transparent)}
+.dots{display:flex;flex-wrap:wrap;gap:5px;margin-top:20px}
+.dots button{width:16px;height:16px;border-radius:4px;background:var(--line);border:0;padding:0;cursor:pointer}
+.dots button.done{background:var(--pen)}
+.dots button.cur{outline:2px solid var(--ink);outline-offset:2px}
+.hint{font-family:var(--f-hand);font-size:1.3rem;color:var(--pen);margin-top:14px}
+
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--paper);border-top:1px solid var(--line);padding-inline:16px}
+.nav-in{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:10px;padding-block:10px}
+.nav .grow{flex:1;min-width:0;font-size:.85rem;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btn{border:1.5px solid var(--pen);background:var(--surface);color:var(--pen);border-radius:9px;padding:9px 15px;font-weight:600;font-size:.92rem;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--pen);color:var(--pen-ink)}
+.btn.primary{background:var(--pen);color:var(--pen-ink)}
+.btn.ghost{border-color:var(--line);color:var(--ink-2)}
+.btn.ghost:hover{background:var(--line);color:var(--ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.score-big{font-family:var(--f-display);font-weight:700;font-size:clamp(2.4rem,7vw,3.6rem);line-height:1;color:var(--pen)}
+.score-sub{font-size:1.05rem;color:var(--ink-2)}
+.mark{font-family:var(--f-display);font-size:1.6rem}
+.tbl{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:8px}
+.tbl th,.tbl td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tbl th{font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-2)}
+.tbl td.num{font-family:var(--f-mono);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar-mini{height:8px;border-radius:4px;background:var(--line);overflow:hidden;min-width:90px}
+.bar-mini i{display:block;height:100%;background:var(--pen)}
+.wrongcard{border:1px solid var(--line);border-left:4px solid var(--bad);border-radius:10px;padding:12px 14px;background:var(--surface);margin-bottom:12px}
+.wrongcard .yours{color:var(--bad)}
+.wrongcard .right{color:var(--good);font-weight:600}
+.wrongcard .why{color:var(--ink-2);font-size:.92rem;margin-top:6px}
+.keycard{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--surface);margin-bottom:8px}
+.keycard b{color:var(--good)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.1;margin:0 0 12px;text-wrap:balance}
+h2{font-family:var(--f-display);font-weight:500;font-size:1.2rem;margin:26px 0 10px}
+p{max-width:64ch}
+.start-list{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:8px}
+.start-list li{padding-left:22px;position:relative}
+.start-list li::before{content:"";position:absolute;left:4px;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--pen)}
+[hidden]{display:none!important}
+@media print{
+  .bar,.nav,.progress,.dots,.no-print{display:none!important}
+  body{background:#fff;color:#000;padding:0}
+  .keycard{break-inside:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="bar" id="bar" hidden>
+  <span class="brand">40 вопросов <b>по курсу</b></span>
+  <span class="chip" id="topicChip">Связный список</span>
+  <span class="spacer"></span>
+  <span class="counter" id="counter">1 / 40</span>
+</header>
+<div class="progress" id="progWrap" hidden><i id="prog"></i></div>
+
+<main class="wrap">
+
+  <section id="start">
+    <h1>Итоговый тест: 40 вопросов</h1>
+    <p>Тест по всем темам курса. На каждый вопрос — один правильный ответ из трёх. Можно возвращаться и менять ответы, пока тест не завершён.</p>
+    <ul class="start-list">
+      <li><b>Связный список</b> — 6 вопросов</li>
+      <li><b>Стек</b> — 5 вопросов</li>
+      <li><b>Сортировки</b> — 8 вопросов</li>
+      <li><b>Бинарный поиск</b> — 3 вопроса</li>
+      <li><b>Рекурсия</b> — 8 вопросов</li>
+      <li><b>Графы</b> — 5 вопросов</li>
+      <li><b>Дерево поиска</b> — 5 вопросов</li>
+    </ul>
+    <p class="hint">В конце будет разбор ошибок и оценка по десятибалльной шкале.</p>
+    <div class="row" style="margin-top:20px">
+      <button class="btn primary" type="button" id="startBtn">Начать тест</button>
+      <button class="btn ghost" type="button" id="keyBtn">Ключ для преподавателя</button>
+    </div>
+  </section>
+
+  <section id="quiz" hidden>
+    <div class="qcard">
+      <p class="topic" id="qTopic"></p>
+      <p class="qtext" id="qText"></p>
+      <div class="ans" id="qAns"></div>
+    </div>
+    <div class="dots" id="dots" aria-label="Переход к вопросу"></div>
+    <p class="hint" id="leftNote"></p>
+  </section>
+
+  <section id="result" hidden></section>
+
+  <section id="key" hidden></section>
+
+</main>
+
+<nav class="nav" id="nav" hidden>
+  <div class="nav-in">
+    <button class="btn" type="button" id="prevBtn">← Назад</button>
+    <span class="grow" id="navNote"></span>
+    <button class="btn primary" type="button" id="nextBtn">Дальше →</button>
+  </div>
+</nav>
+
+<script>
+(() => {
+"use strict";
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const TOPICS = ["Связный список", "Стек", "Сортировки", "Бинарный поиск", "Рекурсия", "Графы", "Дерево поиска"];
+const Q = [
+  {t:0,q:"Что хранит узел двусвязного списка?",o:["Только значение","Значение и ссылку на следующий узел","Значение и ссылки на предыдущий и следующий узлы"],a:2,e:"Поля prev и next позволяют ходить по списку в обе стороны."},
+  {t:0,q:"Список пустой. Выполнили AddFirst(2), AddLast(5), AddFirst(9). Что напечатает printForward?",o:["2 5 9","9 2 5","5 2 9"],a:1,e:"AddFirst(2) → [2]; AddLast(5) → [2, 5]; AddFirst(9) → [9, 2, 5]."},
+  {t:0,q:"Что делает removeLast?",o:["Удаляет первый узел","Удаляет последний узел, tail сдвигается на prev","Очищает весь список"],a:1,e:"tail = tail.prev, затем tail.next = null."},
+  {t:0,q:"Зачем в списке хранить ссылку tail?",o:["Чтобы добавлять и удалять в конце за один шаг","Чтобы список занимал меньше памяти","Чтобы считать длину списка"],a:0,e:"Без tail до конца пришлось бы идти через весь список."},
+  {t:0,q:"По каким ссылкам идёт printBackward?",o:["По next, начиная с head","По prev, начиная с tail","По next, начиная с tail"],a:1,e:"Печать наоборот — это путь от хвоста к голове по ссылкам prev."},
+  {t:0,q:"В списке [4, 7] выполнили removeFirst(). Что напечатает printForward?",o:["4","7","ничего, список пуст"],a:1,e:"Удалили голову 4, остался один узел 7."},
+
+  {t:1,q:"Как работает стек?",o:["Первый пришёл — первый ушёл (FIFO)","Последний пришёл — первый ушёл (LIFO)","Элементы достаются в случайном порядке"],a:1,e:"Снимается всегда верхний элемент."},
+  {t:1,q:"Push(1), Push(2), Push(3), Pop(), Pop(). Что вернёт второй Pop?",o:["1","2","3"],a:1,e:"Первый Pop снял 3, второй снимает 2."},
+  {t:1,q:"Что делает операция Pick (peek)?",o:["Показывает верхний элемент, не удаляя его","Удаляет верхний элемент","Удаляет нижний элемент"],a:0,e:"Pick только смотрит; удаляет Pop."},
+  {t:1,q:"Что должен делать Pop на пустом стеке?",o:["Возвращать 0","Сообщать об ошибке или о том, что стек пуст","Добавлять новый элемент"],a:1,e:"Обращение к пустому стеку без проверки — частая причина NullPointerException."},
+  {t:1,q:"Где стек используется внутри самой Java?",o:["Для хранения массивов","Для хранения незакончившихся вызовов функций","Для сортировки чисел"],a:1,e:"Это стек вызовов. При бесконечной рекурсии он переполняется."},
+
+  {t:2,q:"Сложность сортировки пузырьком в среднем случае?",o:["O(n)","O(n log n)","O(n²)"],a:2,e:"Примерно n·(n−1)/2 сравнений."},
+  {t:2,q:"Пузырёк, массив [4, 1, 6, 2]. Что получится после первого прохода?",o:["[1, 2, 4, 6]","[1, 4, 2, 6]","[4, 1, 2, 6]"],a:1,e:"(4,1) меняем, (4,6) нет, (6,2) меняем — шестёрка всплыла в конец."},
+  {t:2,q:"Что делает метод merge?",o:["Делит массив пополам","Сливает две отсортированные части в одну","Выбирает опорный элемент"],a:1,e:"Сравнивает первые элементы двух частей и забирает меньший."},
+  {t:2,q:"Сложность сортировки слиянием в худшем случае?",o:["O(n log n)","O(n²)","O(log n)"],a:0,e:"Уровней log n, на каждом n работы — и так всегда, без исключений."},
+  {t:2,q:"Главный минус сортировки слиянием?",o:["Работает только с маленькими массивами","Нужна дополнительная память под временный массив","Портит порядок равных элементов"],a:1,e:"Память O(n). Зато скорость гарантирована."},
+  {t:2,q:"Что можно сказать про pivot сразу после partition?",o:["Он стоит на своём окончательном месте","Он всегда оказывается в середине массива","Он удаляется из массива"],a:0,e:"Слева только меньшие, справа только большие — двигать его больше не нужно."},
+  {t:2,q:"Худший случай быстрой сортировки?",o:["O(n log n)","O(n²)","O(n)"],a:1,e:"Например, уже отсортированный массив, когда pivot — последний элемент."},
+  {t:2,q:"Какая из разобранных сортировок проще всего пишется, но работает медленнее всех?",o:["Пузырьком","Слиянием","Быстрая"],a:0,e:"Два цикла и обмен соседей — зато O(n²)."},
+
+  {t:3,q:"Главное условие бинарного поиска?",o:["Массив отсортирован","В массиве нет повторов","Массив небольшой"],a:0,e:"Без порядка непонятно, в какую половину идти."},
+  {t:3,q:"Сколько шагов максимум нужно бинарному поиску среди 1 000 000 чисел?",o:["около 20","около 1 000","до 1 000 000"],a:0,e:"2²⁰ ≈ 1 048 576, значит хватает 20 делений пополам."},
+  {t:3,q:"Когда в бинарном поиске делают lo = mid + 1?",o:["Когда a[mid] больше искомого","Когда a[mid] меньше искомого","Всегда на первом шаге"],a:1,e:"Искомое число правее — левую половину выбрасываем."},
+
+  {t:4,q:"Без чего рекурсия никогда не закончится?",o:["Без цикла","Без базового случая","Без массива"],a:1,e:"Базовый случай — это место, где рекурсия останавливается."},
+  {t:4,q:"Чему равно factorial(4)?",o:["12","24","16"],a:1,e:"4 · 3 · 2 · 1 = 24."},
+  {t:4,q:"Какой из вызовов, стоящих в стеке, закончится первым?",o:["Самый первый вызванный","Самый последний вызванный","Все заканчиваются одновременно"],a:1,e:"LIFO: снимается верхний кадр стека."},
+  {t:4,q:"Почему у Фибоначчи два базовых случая, а у факториала один?",o:["Так исторически сложилось","Потому что для ответа нужны два предыдущих числа","Чтобы работало быстрее"],a:1,e:"fib(n) = fib(n−1) + fib(n−2), поэтому останавливаться надо на двух значениях."},
+  {t:4,q:"Что делает мемоизация?",o:["Запоминает уже посчитанные ответы, чтобы не считать их заново","Уменьшает размер чисел","Убирает рекурсию из кода"],a:0,e:"Ответ функции не меняется — меняется только скорость."},
+  {t:4,q:"Сколько ходов нужно для 4 дисков в Ханойских башнях?",o:["8","15","16"],a:1,e:"2⁴ − 1 = 15."},
+  {t:4,q:"Что произойдёт при рекурсии без остановки?",o:["Программа просто зависнет навсегда","Программа упадёт с StackOverflowError","Компилятор не соберёт программу"],a:1,e:"Место в стеке вызовов закончится."},
+  {t:4,q:"Базовый случай в mergeSort — это…",o:["left >= right, то есть кусок из 0 или 1 элемента","вызов merge","середина массива mid"],a:0,e:"Одиночка уже отсортирована, делить дальше нечего."},
+
+  {t:5,q:"Что такое степень вершины?",o:["Её номер","Число её рёбер","Расстояние до ближайшего соседа"],a:1,e:"Сумма степеней всех вершин равна удвоенному числу рёбер."},
+  {t:5,q:"Сколько памяти занимает матрица смежности для n вершин?",o:["n","n²","2m"],a:1,e:"Таблица n строк на n столбцов, независимо от числа рёбер."},
+  {t:5,q:"В неориентированном графе добавили ребро 2–4. Что меняется в матрице?",o:["Только ячейка m[2][4]","Две ячейки: m[2][4] и m[4][2]","Вся строка номер 2"],a:1,e:"Матрица неориентированного графа симметрична."},
+  {t:5,q:"Соцсеть на миллион пользователей, у каждого около 100 друзей. Что выбрать?",o:["Матрицу смежности","Список смежности"],a:1,e:"Матрица заняла бы около терабайта почти из одних нулей."},
+  {t:5,q:"В неориентированном графе 6 рёбер. Сколько всего чисел в списке смежности?",o:["6","12","36"],a:1,e:"Каждое ребро записано дважды — у обоих концов."},
+
+  {t:6,q:"Куда в дереве поиска идёт число, которое меньше узла?",o:["Налево","Направо","В корень"],a:0,e:"Главное правило: слева меньше, справа больше."},
+  {t:6,q:"Что печатает обход in-order?",o:["Числа по возрастанию","Числа в порядке вставки","Только листья"],a:0,e:"Левое поддерево, потом сам узел, потом правое."},
+  {t:6,q:"Базовый случай метода insert?",o:["value == node.value","node == null","height == 0"],a:1,e:"Пустое место найдено — создаём новый узел."},
+  {t:6,q:"Числа вставляли по возрастанию: 1, 2, 3, 4, 5. Каким получилось дерево?",o:["Ровным, высотой 3","«Палкой» высотой 5 — поиск превратился в перебор","Пустым"],a:1,e:"Каждое следующее число больше предыдущего и уходит вправо."},
+  {t:6,q:"Сколько сравнений нужно на поиск в дереве высоты 4?",o:["Максимум 4","До 16","Всегда 1"],a:0,e:"По одному сравнению на уровень."}
+];
+
+const KEY = "test40-answers";
+let ans = new Array(Q.length).fill(null);
+let cur = 0, finished = false;
+try {
+  const saved = JSON.parse(localStorage.getItem(KEY) || "null");
+  if (Array.isArray(saved) && saved.length === Q.length) ans = saved;
+} catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(ans)); } catch (e) {} };
+const left = () => ans.filter(x => x === null).length;
+const score = () => ans.reduce((s, v, i) => s + (v === Q[i].a ? 1 : 0), 0);
+
+function show(id) {
+  ["start", "quiz", "result", "key"].forEach(s => $("#" + s).hidden = s !== id);
+  const inQuiz = id === "quiz";
+  $("#bar").hidden = !inQuiz; $("#progWrap").hidden = !inQuiz; $("#nav").hidden = !inQuiz;
+  window.scrollTo(0, 0);
+}
+
+function drawQuestion() {
+  const q = Q[cur];
+  $("#qTopic").textContent = TOPICS[q.t];
+  $("#topicChip").textContent = TOPICS[q.t];
+  $("#qText").textContent = (cur + 1) + ". " + q.q;
+  $("#qAns").innerHTML = q.o.map((o, i) =>
+    `<button type="button" data-i="${i}" aria-pressed="${ans[cur] === i}">${esc(o)}</button>`).join("");
+  $("#counter").textContent = `${cur + 1} / ${Q.length}`;
+  $("#prog").style.width = ((cur + 1) / Q.length * 100) + "%";
+  $("#dots").innerHTML = Q.map((_, i) =>
+    `<button type="button" class="${ans[i] !== null ? "done" : ""}${i === cur ? " cur" : ""}" data-go="${i}" aria-label="Вопрос ${i + 1}"></button>`).join("");
+  $("#prevBtn").disabled = cur === 0;
+  const n = left();
+  $("#leftNote").textContent = n ? `Без ответа осталось вопросов: ${n}` : "Все вопросы отвечены — можно завершать тест.";
+  $("#navNote").textContent = n ? `Отвечено ${Q.length - n} из ${Q.length}` : "Готово к проверке";
+  $("#nextBtn").textContent = cur === Q.length - 1 ? "Завершить тест" : "Дальше →";
+  $("#nextBtn").disabled = cur === Q.length - 1 && n > 0;
+}
+
+function drawResult() {
+  const s = score(), pct = Math.round(s / Q.length * 100), mark = Math.round(s / Q.length * 10);
+  const byTopic = TOPICS.map((name, t) => {
+    const idx = Q.map((q, i) => q.t === t ? i : -1).filter(i => i >= 0);
+    const ok = idx.filter(i => ans[i] === Q[i].a).length;
+    return { name, ok, total: idx.length };
+  });
+  const wrong = Q.map((q, i) => ({ q, i })).filter(({ q, i }) => ans[i] !== q.a);
+  $("#result").innerHTML = `
+    <h1>Результат</h1>
+    <p class="score-big">${s} из ${Q.length}</p>
+    <p class="score-sub">${pct}% верных ответов · оценка <span class="mark">${mark}</span> из 10</p>
+    <h2>По темам</h2>
+    <table class="tbl">
+      <thead><tr><th>Тема</th><th>Результат</th><th class="num">Верно</th></tr></thead>
+      <tbody>${byTopic.map(t => `<tr><td>${t.name}</td><td><span class="bar-mini"><i style="width:${Math.round(t.ok / t.total * 100)}%"></i></span></td><td class="num">${t.ok} / ${t.total}</td></tr>`).join("")}</tbody>
+    </table>
+    <h2>${wrong.length ? "Разбор ошибок (" + wrong.length + ")" : "Ошибок нет — отличная работа!"}</h2>
+    ${wrong.map(({ q, i }) => `<div class="wrongcard">
+      <p style="margin:0 0 6px"><b>${i + 1}. ${esc(q.q)}</b></p>
+      <p style="margin:0" class="yours">Твой ответ: ${ans[i] === null ? "нет ответа" : esc(q.o[ans[i]])}</p>
+      <p style="margin:2px 0 0" class="right">Верно: ${esc(q.o[q.a])}</p>
+      <p class="why">${esc(q.e)}</p></div>`).join("")}
+    <div class="row no-print" style="margin-top:22px">
+      <button class="btn primary" type="button" data-a="again">Пройти заново</button>
+      <button class="btn" type="button" data-a="key">Показать ключ</button>
+      <button class="btn ghost" type="button" data-a="print">Распечатать</button>
+    </div>`;
+  show("result");
+}
+
+function drawKey() {
+  $("#key").innerHTML = `<h1>Ключ ответов</h1>
+    <p class="no-print">40 вопросов с правильными ответами и короткими пояснениями. Страницу можно распечатать.</p>
+    ${TOPICS.map((name, t) => `<h2>${name}</h2>` + Q.map((q, i) => ({ q, i })).filter(({ q }) => q.t === t)
+      .map(({ q, i }) => `<div class="keycard"><p style="margin:0">${i + 1}. ${esc(q.q)}</p>
+        <p style="margin:4px 0 0"><b>${esc(q.o[q.a])}</b></p>
+        <p style="margin:2px 0 0;color:var(--ink-2);font-size:.9rem">${esc(q.e)}</p></div>`).join("")).join("")}
+    <div class="row no-print" style="margin-top:22px">
+      <button class="btn primary" type="button" data-a="back">Назад</button>
+      <button class="btn ghost" type="button" data-a="print">Распечатать</button>
+    </div>`;
+  show("key");
+}
+
+$("#qAns").addEventListener("click", e => {
+  const b = e.target.closest("button[data-i]"); if (!b) return;
+  ans[cur] = +b.dataset.i; save();
+  drawQuestion();
+});
+$("#dots").addEventListener("click", e => {
+  const b = e.target.closest("button[data-go]"); if (!b) return;
+  cur = +b.dataset.go; drawQuestion();
+});
+$("#prevBtn").addEventListener("click", () => { if (cur > 0) { cur--; drawQuestion(); } });
+$("#nextBtn").addEventListener("click", () => {
+  if (cur < Q.length - 1) { cur++; drawQuestion(); return; }
+  if (left() > 0) return;
+  finished = true; drawResult();
+});
+$("#startBtn").addEventListener("click", () => { cur = ans.findIndex(x => x === null); if (cur < 0) cur = 0; show("quiz"); drawQuestion(); });
+$("#keyBtn").addEventListener("click", drawKey);
+document.addEventListener("click", e => {
+  const a = e.target.closest("button[data-a]")?.dataset.a; if (!a) return;
+  if (a === "again") { ans = new Array(Q.length).fill(null); save(); cur = 0; finished = false; show("quiz"); drawQuestion(); }
+  if (a === "key") drawKey();
+  if (a === "back") { finished ? drawResult() : show("start"); }
+  if (a === "print") window.print();
+});
+document.addEventListener("keydown", e => {
+  if ($("#quiz").hidden) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); $("#nextBtn").click(); }
+  if (e.key === "ArrowLeft") { e.preventDefault(); $("#prevBtn").click(); }
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= Q[cur].o.length) { ans[cur] = n - 1; save(); drawQuestion(); }
+});
+show("start");
+})();
+</script>
